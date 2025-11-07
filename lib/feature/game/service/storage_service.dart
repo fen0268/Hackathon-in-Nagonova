@@ -43,20 +43,23 @@ class StorageService {
 
   /// マッチ用の画像をアップロード
   ///
-  /// パス: matches/{matchId}/round{roundNumber}_player{playerNumber}.jpg
+  /// パス: matches/{matchId}/player{playerNumber}.jpg
   /// タイムアウト: 10秒
   Future<String> uploadMatchImage({
     required String matchId,
-    required int roundNumber,
     required int playerNumber,
     required File imageFile,
   }) async {
     try {
+      print('[StorageService] 画像処理開始: $matchId, player$playerNumber');
+
       // 画像を処理（リサイズ・圧縮）
       final processedImage = await _processImage(imageFile);
+      print('[StorageService] 画像処理完了: ${processedImage.length} bytes');
 
       // ストレージパスを生成
-      final path = 'matches/$matchId/round${roundNumber}_player$playerNumber.jpg';
+      final path = 'matches/$matchId/player$playerNumber.jpg';
+      print('[StorageService] アップロード先: $path');
       final ref = _storage.ref().child(path);
 
       // メタデータ設定
@@ -64,34 +67,41 @@ class StorageService {
         contentType: 'image/jpeg',
         customMetadata: {
           'matchId': matchId,
-          'roundNumber': roundNumber.toString(),
           'playerNumber': playerNumber.toString(),
           'uploadedAt': DateTime.now().toIso8601String(),
         },
       );
 
       // アップロード（10秒タイムアウト）
+      print('[StorageService] Firebase Storageへアップロード開始...');
       final uploadTask = ref.putData(processedImage, metadata);
 
       // タイムアウト設定
       final snapshot = await uploadTask.timeout(
         const Duration(seconds: 10),
         onTimeout: () {
+          print('[StorageService] アップロードタイムアウト');
           // タイムアウト時はアップロードをキャンセル
           uploadTask.cancel();
           throw TimeoutException('Upload timeout: 10 seconds exceeded');
         },
       );
 
+      print('[StorageService] アップロード完了');
+
       // ダウンロードURLを取得
       final downloadUrl = await snapshot.ref.getDownloadURL();
+      print('[StorageService] ダウンロードURL取得: $downloadUrl');
 
       return downloadUrl;
     } on FirebaseException catch (e) {
+      print('[StorageService] Firebase Storage エラー: ${e.code} - ${e.message}');
       throw StorageException('Firebase Storage error: ${e.message}', e.code);
     } on TimeoutException {
+      print('[StorageService] タイムアウト');
       throw StorageException('Upload timeout', 'timeout');
     } catch (e) {
+      print('[StorageService] 不明なエラー: $e');
       throw StorageException('Upload failed: $e', 'unknown');
     }
   }
