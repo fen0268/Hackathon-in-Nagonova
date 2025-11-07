@@ -15,7 +15,7 @@ const gameStateProvider = GameStateNotifierFamily._();
 
 /// ゲーム状態管理プロバイダー
 final class GameStateNotifierProvider
-    extends $NotifierProvider<GameStateNotifier, GameState?> {
+    extends $NotifierProvider<GameStateNotifier, GameState> {
   /// ゲーム状態管理プロバイダー
   const GameStateNotifierProvider._({
     required GameStateNotifierFamily super.from,
@@ -43,10 +43,10 @@ final class GameStateNotifierProvider
   GameStateNotifier create() => GameStateNotifier();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(GameState? value) {
+  Override overrideWithValue(GameState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<GameState?>(value),
+      providerOverride: $SyncValueProvider<GameState>(value),
     );
   }
 
@@ -61,7 +61,7 @@ final class GameStateNotifierProvider
   }
 }
 
-String _$gameStateNotifierHash() => r'f4fed302cf3b612004ab3c363abbfe02ead73be7';
+String _$gameStateNotifierHash() => r'137d55dd6457029f5bf6907de55f7ba2073c70e7';
 
 /// ゲーム状態管理プロバイダー
 
@@ -69,9 +69,9 @@ final class GameStateNotifierFamily extends $Family
     with
         $ClassFamilyOverride<
           GameStateNotifier,
-          GameState?,
-          GameState?,
-          GameState?,
+          GameState,
+          GameState,
+          GameState,
           String
         > {
   const GameStateNotifierFamily._()
@@ -94,21 +94,21 @@ final class GameStateNotifierFamily extends $Family
 
 /// ゲーム状態管理プロバイダー
 
-abstract class _$GameStateNotifier extends $Notifier<GameState?> {
+abstract class _$GameStateNotifier extends $Notifier<GameState> {
   late final _$args = ref.$arg as String;
   String get matchId => _$args;
 
-  GameState? build(String matchId);
+  GameState build(String matchId);
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref = this.ref as $Ref<GameState?, GameState?>;
+    final ref = this.ref as $Ref<GameState, GameState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<GameState?, GameState?>,
-              GameState?,
+              AnyNotifier<GameState, GameState>,
+              GameState,
               Object?,
               Object?
             >;

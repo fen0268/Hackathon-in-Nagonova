@@ -10,7 +10,10 @@
       "Bash(fvm flutter analyze:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(fvm flutter clean:*)",
+      "Bash(pod install:*)",
+      "Bash(export LANG=en_US.UTF-8)"
     ],
     "deny": [],
     "ask": []

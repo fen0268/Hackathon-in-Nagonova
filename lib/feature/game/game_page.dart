@@ -16,33 +16,57 @@ class GamePage extends ConsumerStatefulWidget {
   ConsumerState<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends ConsumerState<GamePage> {
+class _GamePageState extends ConsumerState<GamePage>
+    with TickerProviderStateMixin {
+  late AnimationController _countdownAnimationController;
+  late Animation<double> _countdownScaleAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    // カウントダウンアニメーションの初期化
+    _countdownAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _countdownScaleAnimation = Tween<double>(begin: 0.5, end: 1).animate(
+      CurvedAnimation(
+        parent: _countdownAnimationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
     // ゲーム開始を少し遅延させてUIが準備できるまで待つ
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        ref
-            .read(gameStateProvider(widget.matchId).notifier)
-            .startGame();
+        ref.read(gameStateProvider(widget.matchId).notifier).startGame();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _countdownAnimationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider(widget.matchId));
 
-    // 状態がまだ初期化されていない場合
-    if (gameState == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
-      );
-    }
+    // カウントダウンが変わったらアニメーション再生
+    ref.listen<GameState>(
+      gameStateProvider(widget.matchId),
+      (previous, next) {
+        if (previous?.countdown != next.countdown &&
+            (next.phase == GamePhase.round1Countdown ||
+                next.phase == GamePhase.round2Countdown)) {
+          _countdownAnimationController.forward(from: 0);
+        }
+      },
+    );
 
     // エラーがある場合
     if (gameState.error != null) {
@@ -227,35 +251,167 @@ class _GamePageState extends ConsumerState<GamePage> {
 
   /// 撮影前のカウントダウン表示（5→4→3→2→1）
   Widget _buildCountdownView(GameState gameState) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '${gameState.countdown}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 120,
-              fontWeight: FontWeight.bold,
+    // カウントダウンに応じて色を変化
+    Color getCountdownColor(int countdown) {
+      switch (countdown) {
+        case 5:
+          return Colors.green;
+        case 4:
+          return Colors.lightGreen;
+        case 3:
+          return Colors.yellow;
+        case 2:
+          return Colors.orange;
+        case 1:
+          return Colors.red;
+        default:
+          return Colors.white;
+      }
+    }
+
+    final countdownColor = getCountdownColor(gameState.countdown);
+    final progress = gameState.countdown / 5.0;
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          colors: [
+            countdownColor.withOpacity(0.3),
+            Colors.black,
+          ],
+          stops: const [0.0, 0.7],
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 円形プログレスバー付きカウントダウン
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // 外側のプログレスバー
+                SizedBox(
+                  width: 280,
+                  height: 280,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 12,
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    valueColor: AlwaysStoppedAnimation<Color>(countdownColor),
+                  ),
+                ),
+
+                // アニメーション付き数字
+                AnimatedBuilder(
+                  animation: _countdownScaleAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _countdownScaleAnimation.value,
+                      child: Container(
+                        width: 200,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: countdownColor.withOpacity(0.3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: countdownColor.withOpacity(0.5),
+                              blurRadius: 40,
+                              spreadRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${gameState.countdown}',
+                            style: TextStyle(
+                              color: countdownColor,
+                              fontSize: 140,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  color: countdownColor.withOpacity(0.5),
+                                  blurRadius: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            '撮影までのカウントダウン',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 18,
+
+            const SizedBox(height: 60),
+
+            // 説明テキスト
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: countdownColor.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '撮影まで',
+                    style: TextStyle(
+                      color: countdownColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'カメラに向かって面白い顔を作ろう！',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'カメラに向かって面白い顔を作ろう！',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
+
+            const SizedBox(height: 32),
+
+            // プログレスドット
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (index) {
+                final isActive = index < (5 - gameState.countdown);
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isActive
+                        ? countdownColor
+                        : Colors.white.withOpacity(0.2),
+                    boxShadow: isActive
+                        ? [
+                            BoxShadow(
+                              color: countdownColor.withOpacity(0.5),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            ),
+                          ]
+                        : null,
+                  ),
+                );
+              }),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
