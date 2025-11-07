@@ -45,7 +45,7 @@ final class MatchmakingControllerProvider
 }
 
 String _$matchmakingControllerHash() =>
-    r'35f6639d3866243249d50fec0360c6ef677c66b0';
+    r'3d1ddf6bcfec7b9c0febc7e6e3b80240744574ab';
 
 /// マッチメイキングプロバイダー
 
