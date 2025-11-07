@@ -6,7 +6,7 @@ class HomePage extends ConsumerStatefulWidget {
 
   HomePageState createConsumerState() => HomePageState();
 
-  static const routeName = 'home';
+  static const routeName = '/home';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => HomePageState();
