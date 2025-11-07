@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hackathon_app/feature/game/model/round_model.dart';
 import 'package:hackathon_app/util/datetime_converter.dart';
 
 part 'match_model.freezed.dart';
@@ -14,10 +13,25 @@ abstract class MatchModel with _$MatchModel {
     @Default('waiting') String status,
     @DateTimeConverter() required DateTime startedAt,
     @NullableDateTimeConverter() DateTime? finishedAt,
-    @Default(1) int currentRound,
-    RoundModel? round1,
-    RoundModel? round2,
-    String? finalWinner,
+    // 画像
+    String? player1ImageUrl,
+    String? player2ImageUrl,
+    // タイミング
+    @NullableDateTimeConverter() DateTime? shootingAt,
+    @NullableDateTimeConverter() DateTime? player1UploadedAt,
+    @NullableDateTimeConverter() DateTime? player2UploadedAt,
+    @NullableDateTimeConverter() DateTime? imagesDisplayedAt,
+    // 笑顔判定
+    @NullableDateTimeConverter() DateTime? player1SmileDetectedAt,
+    @NullableDateTimeConverter() DateTime? player2SmileDetectedAt,
+    // 結果
+    String? winner,
+    @NullableDateTimeConverter() DateTime? gameEndedAt,
+    // 統計
+    double? player1UploadTime,
+    double? player2UploadTime,
+    double? player1ReactionTime,
+    double? player2ReactionTime,
     @DateTimeConverter() required DateTime createdAt,
   }) = _MatchModel;
 
