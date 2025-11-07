@@ -107,7 +107,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // フェーズに応じた情報表示
+          // フェーズに応じた情報表示（対戦中のみ表示）
           if (gameState.phase == GamePhase.playing)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -117,22 +117,6 @@ class _GamePageState extends ConsumerState<GamePage> {
               ),
               child: Text(
                 '残り時間: ${gameState.playingTimeRemaining}秒',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          else if (gameState.phase == GamePhase.preparing)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '準備中: ${gameState.preparingTimeRemaining}秒',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -318,31 +302,6 @@ class _GamePageState extends ConsumerState<GamePage> {
               color: Colors.white,
               fontSize: 18,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 終了確認ダイアログ
-  void _showQuitDialog() {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('ゲームを終了しますか？'),
-        content: const Text('ゲームを中断すると負けとなります。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(gameStateProvider(widget.matchId).notifier).quitGame();
-              context.go('/');
-            },
-            child: const Text('終了', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
