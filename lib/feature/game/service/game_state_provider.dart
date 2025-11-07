@@ -32,6 +32,7 @@ class GameState {
     this.opponentImageUrl,
     this.preparingTimeRemaining = 5,
     this.error,
+    this.isUploading = false,
   });
 
   final String matchId;
@@ -43,6 +44,7 @@ class GameState {
   final String? opponentImageUrl; // 相手の画像URL
   final int preparingTimeRemaining; // 準備中の残り時間（5秒自動待機）
   final String? error;
+  final bool isUploading; // 画像アップロード中かどうか
 
   GameState copyWith({
     String? matchId,
@@ -54,6 +56,7 @@ class GameState {
     String? opponentImageUrl,
     int? preparingTimeRemaining,
     String? error,
+    bool? isUploading,
   }) {
     return GameState(
       matchId: matchId ?? this.matchId,
@@ -66,6 +69,7 @@ class GameState {
       preparingTimeRemaining:
           preparingTimeRemaining ?? this.preparingTimeRemaining,
       error: error ?? this.error,
+      isUploading: isUploading ?? this.isUploading,
     );
   }
 
@@ -215,6 +219,9 @@ class GameStateNotifier extends _$GameStateNotifier {
 
     print('[GameState] 撮影完了処理開始');
 
+    // ローディング表示を開始
+    state = currentState.copyWith(isUploading: true);
+
     // 撮影時刻を記録
     final shootingAt = DateTime.now();
     print('[GameState] Firestoreに撮影時刻を記録中...');
@@ -232,10 +239,11 @@ class GameStateNotifier extends _$GameStateNotifier {
     await cameraService.stopCamera();
     print('[GameState] カメラ停止完了');
 
-    // 準備中フェーズへ
-    state = currentState.copyWith(
+    // ローディング表示を終了して準備中フェーズへ
+    state = state.copyWith(
       phase: GamePhase.preparing,
       preparingTimeRemaining: 5,
+      isUploading: false,
     );
 
     print('[GameState] Firestoreにステータス更新中: preparing');

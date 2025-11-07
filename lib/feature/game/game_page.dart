@@ -95,6 +95,39 @@ class _GamePageState extends ConsumerState<GamePage> {
                 ),
               ],
             ),
+            // ローディングオーバーレイ（撮影後のアップロード中）
+            if (gameState.isUploading)
+              ColoredBox(
+                color: Colors.black.withValues(alpha: 0.8),
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ),
+                      SizedBox(height: 24),
+                      Text(
+                        '撮影完了',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        '画像をアップロード中...',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
