@@ -68,27 +68,17 @@
 #### 3.3.1 対戦フロー
 
 ```
-【ラウンド1】
 カウントダウン (5→4→3→2→1→0)
 ↓
 撮影（音あり）→ Firebase Storage アップロード
 ↓
-準備完了待機（最大10秒）
-  - 10秒以内に準備完了しない場合:
-    - 片方のみ遅延 → その人の負け
-    - 両方遅延 → 引き分け
-  → result 画面
+5秒待機（自動的に次へ進む）
+  - 5秒後に自動的に画像表示画面へ遷移
+  - URLがない場合の判定:
+    - 片方のみURLなし → その人の負け → result 画面
+    - 両方URLなし → 引き分け → result 画面
 ↓
-両者準備完了 → 3秒カウントダウン (3→2→1)
-↓
-画像表示 + MediaPipe 起動 + にらめっこ開始
-↓
-【勝敗判定】
-  - 笑顔検知（10秒以内）→ 笑った方の負け → result 画面
-  - 10秒経過しても笑わず → ラウンド2 へ
-
-【ラウンド2】
-（ラウンド1と同じフロー）
+画像表示 + MediaPipe 起動 + にらめっこ開始（10秒）
 ↓
 【勝敗判定】
   - 笑顔検知（10秒以内）→ 笑った方の負け → result 画面
@@ -97,15 +87,14 @@
 
 #### 3.3.2 勝敗パターン
 
-| ラウンド1 | ラウンド2 | 最終結果 |
-|---------|---------|--------|
-| player1が笑った | - | player2勝 |
-| player2が笑った | - | player1勝 |
-| タイムアウト負け | - | その結果で終了 |
-| 両者笑わず | player1が笑った | player2勝 |
-| 両者笑わず | player2が笑った | player1勝 |
-| 両者笑わず | タイムアウト負け | その結果で終了 |
-| 両者笑わず | 両者笑わず | 引き分け |
+| 状況 | 結果 |
+|---------|--------|
+| player1が笑った | player2が勝 |
+| player2が笑った | player1が勝 |
+| player1のURLなし | player2が勝 |
+| player2のURLなし | player1が勝 |
+| 両者URLなし | 引き分け |
+| 両者10秒間笑わず | 引き分け |
 
 #### 3.3.3 画像仕様
 - **撮影タイミング**: カウントダウン0秒時点（自動撮影、音あり）
@@ -118,18 +107,9 @@
 #### 3.3.4 表示仕様
 - **対戦画面レイアウト**:
   - 相手の静止画（大画面）
-  - 自分のリアルタイムカメラ（小画面）
+  - 自分のリアルタイムカメラ（プレビューはない）
   - 笑顔判定状態表示
   - 残り時間表示
-  - 絵文字ボタン
-
-### 3.4 絵文字・エフェクト機能
-- **仕様**:
-  - 絵文字・エフェクトボタン（画面下部）
-  - タップで全画面ポップアップ表示（1秒間）
-  - 動的クールタイム（使用頻度に応じて延長）
-  - 相手画面にもリアルタイム表示
-- **目的**: 相手を笑わせる戦略要素
 
 ### 3.5 ランキング機能
 - **表示内容**:
@@ -173,76 +153,38 @@
   matchId: "auto-generated",
   player1: "userId1",
   player2: "userId2",
-  
-  status: "waiting",  
-  // waiting | round1_countdown | round1_preparing | 
-  // round1_countdown_to_display | round1_playing | 
-  // round2_countdown | round2_preparing | 
-  // round2_countdown_to_display | round2_playing | finished
-  
+
+  status: "waiting",
+
   startedAt: timestamp,
   finishedAt: null,
-  currentRound: 1,
-  
-  // ラウンド1
-  round1: {
-    // 画像
-    player1ImageUrl: null,
-    player2ImageUrl: null,
-    player1ImageReady: false,
-    player2ImageReady: false,
-    
-    // タイミング
-    shootingAt: null,                  // 撮影時刻（カウントダウン0）
-    player1UploadedAt: null,           // アップロード完了時刻
-    player2UploadedAt: null,
-    bothReadyAt: null,                 // 両者準備完了時刻
-    displayCountdownStartedAt: null,   // 3秒カウント開始時刻
-    imagesDisplayedAt: null,           // 画像表示時刻
-    
-    // 笑顔判定
-    player1SmileDetectedAt: null,
-    player2SmileDetectedAt: null,
-    
-    // 結果
-    winner: null,  
-    // "player1" | "player2" | "none" | 
-    // "timeout_player1" | "timeout_player2" | "timeout_draw"
-    roundEndedAt: null,
-    
-    // 統計
-    player1UploadTime: null,           // 撮影→アップロード (秒)
-    player2UploadTime: null,
-    player1ReactionTime: null,         // 画像表示→笑顔検知 (秒)
-    player2ReactionTime: null
-  },
-  
-  // ラウンド2
-  round2: {
-    // round1 と同じ構造
-    player1ImageUrl: null,
-    player2ImageUrl: null,
-    player1ImageReady: false,
-    player2ImageReady: false,
-    shootingAt: null,
-    player1UploadedAt: null,
-    player2UploadedAt: null,
-    bothReadyAt: null,
-    displayCountdownStartedAt: null,
-    imagesDisplayedAt: null,
-    player1SmileDetectedAt: null,
-    player2SmileDetectedAt: null,
-    winner: null,
-    roundEndedAt: null,
-    player1UploadTime: null,
-    player2UploadTime: null,
-    player1ReactionTime: null,
-    player2ReactionTime: null
-  },
-  
-  // 最終結果
-  finalWinner: null,  // "player1" | "player2" | "draw"
-  
+
+  // 画像
+  player1ImageUrl: null,
+  player2ImageUrl: null,
+
+  // タイミング
+  shootingAt: null,                  // 撮影時刻（カウントダウン0）
+  player1UploadedAt: null,           // アップロード完了時刻
+  player2UploadedAt: null,
+  imagesDisplayedAt: null,           // 画像表示時刻（5秒後）
+
+  // 笑顔判定
+  player1SmileDetectedAt: null,
+  player2SmileDetectedAt: null,
+
+  // 結果
+  winner: null,
+  // "player1" | "player2" | "draw" |
+  // "url_missing_player1" | "url_missing_player2" | "url_missing_both"
+  gameEndedAt: null,
+
+  // 統計
+  player1UploadTime: null,           // 撮影→アップロード (秒)
+  player2UploadTime: null,
+  player1ReactionTime: null,         // 画像表示→笑顔検知 (秒)
+  player2ReactionTime: null,
+
   createdAt: timestamp
 }
 ```
@@ -285,9 +227,9 @@ home_page（ホーム画面）
 └─ 設定
 ↓
 game_page（対戦画面）
-├─ カウントダウン
+├─ 5秒カウントダウン後に撮影
 ├─ 準備待機
-├─ 3秒カウント
+├─ 10秒カウント
 ├─ にらめっこ対戦
 └─ 勝敗判定
 ↓
