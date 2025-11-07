@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../matching/matching_page.dart';
 import '../ranking/ranking_page.dart';
+import '../settings/settings_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -31,7 +32,7 @@ class HomePageState extends ConsumerState<HomePage> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // TODO: 設定画面への遷移
+              context.push(SettingsPage.routeName);
             },
           ),
         ],
