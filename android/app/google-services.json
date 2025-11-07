@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "932995165005",
+    "project_id": "hackathon-in-nagonova",
+    "storage_bucket": "hackathon-in-nagonova.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932995165005:android:e3049c3381ef2e2aa1e504",
+        "android_client_info": {
+          "package_name": "com.fenc0268.hackathon_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ4g4tmKnnSm97X3c266_CWk1pG-rDzbo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
