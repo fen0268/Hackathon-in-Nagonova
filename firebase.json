@@ -1,1 +1,44 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"hackathon-in-nagonova","appId":"1:932995165005:android:e3049c3381ef2e2aa1e504","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"hackathon-in-nagonova","appId":"1:932995165005:ios:33938718b72d38e7a1e504","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"hackathon-in-nagonova","configurations":{"android":"1:932995165005:android:e3049c3381ef2e2aa1e504","ios":"1:932995165005:ios:33938718b72d38e7a1e504","web":"1:932995165005:web:0d7b733c478c9a1ca1e504"}}}}}}
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions",
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run lint",
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "hackathon-in-nagonova",
+          "appId": "1:932995165005:android:e3049c3381ef2e2aa1e504",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "hackathon-in-nagonova",
+          "appId": "1:932995165005:ios:33938718b72d38e7a1e504",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "hackathon-in-nagonova",
+          "configurations": {
+            "android": "1:932995165005:android:e3049c3381ef2e2aa1e504",
+            "ios": "1:932995165005:ios:33938718b72d38e7a1e504",
+            "web": "1:932995165005:web:0d7b733c478c9a1ca1e504"
+          }
+        }
+      }
+    }
+  }
+}

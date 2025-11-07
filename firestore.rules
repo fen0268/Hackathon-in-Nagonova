@@ -1,0 +1,103 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isMatchPlayer(matchData) {
+      return isAuthenticated() &&
+             (request.auth.uid == matchData.player1Id ||
+              request.auth.uid == matchData.player2Id);
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile and anyone else's public profile
+      allow read: if isAuthenticated();
+
+      // Users can only create/update their own profile
+      allow create: if isOwner(userId) &&
+                      request.resource.data.keys().hasAll(['userId', 'nickname', 'createdAt']) &&
+                      request.resource.data.userId == userId;
+
+      allow update: if isOwner(userId) &&
+                      // Prevent users from modifying their own stats directly
+                      // Stats are updated by Cloud Functions only
+                      !request.resource.data.diff(resource.data).affectedKeys()
+                        .hasAny(['totalMatches', 'wins', 'losses', 'winRate']);
+
+      // Users cannot delete their profile
+      allow delete: if false;
+    }
+
+    // Matchmaking queue
+    match /matchmaking/{entryId} {
+      // Anyone authenticated can read the matchmaking queue
+      allow read: if isAuthenticated();
+
+      // Users can only create entries for themselves
+      allow create: if isAuthenticated() &&
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['userId', 'nickname', 'status', 'createdAt']);
+
+      // Users can update their own matchmaking status
+      allow update: if isAuthenticated() &&
+                      resource.data.userId == request.auth.uid;
+
+      // Users can delete their own matchmaking entry
+      allow delete: if isAuthenticated() &&
+                      resource.data.userId == request.auth.uid;
+    }
+
+    // Matches collection
+    match /matches/{matchId} {
+      // Players in the match can read it
+      allow read: if isAuthenticated() && isMatchPlayer(resource.data);
+
+      // Only Cloud Functions can create matches (via server-side matchmaking)
+      // However, we need to allow client creation temporarily for backward compatibility
+      allow create: if isAuthenticated() &&
+                      request.resource.data.keys().hasAll([
+                        'matchId', 'player1Id', 'player2Id',
+                        'player1Nickname', 'player2Nickname',
+                        'currentRound', 'status', 'createdAt'
+                      ]) &&
+                      (request.resource.data.player1Id == request.auth.uid ||
+                       request.resource.data.player2Id == request.auth.uid);
+
+      // Players can update match data with restrictions
+      allow update: if isAuthenticated() &&
+                      isMatchPlayer(resource.data) &&
+                      // Prevent changing player IDs or match ID
+                      !request.resource.data.diff(resource.data).affectedKeys()
+                        .hasAny(['matchId', 'player1Id', 'player2Id']) &&
+                      // Validate status transitions
+                      (request.resource.data.status in ['waiting', 'playing', 'finished']);
+
+      // Matches cannot be deleted by clients
+      allow delete: if false;
+    }
+
+    // Rankings/Leaderboard collection
+    match /rankings/{userId} {
+      // Everyone can read the leaderboard
+      allow read: if isAuthenticated();
+
+      // Only Cloud Functions can write rankings
+      allow write: if false;
+    }
+
+    // Deny all other paths by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
