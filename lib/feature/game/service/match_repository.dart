@@ -55,7 +55,15 @@ class MatchRepository {
     await _matchesCollection.doc(matchId).update({'status': status});
   }
 
-  /// ラウンド情報を更新
+  /// マッチデータを更新（1ラウンド制用）
+  Future<void> updateMatchData({
+    required String matchId,
+    required Map<String, dynamic> data,
+  }) async {
+    await _matchesCollection.doc(matchId).update(data);
+  }
+
+  /// ラウンド情報を更新（旧2ラウンド制用、互換性のため残す）
   Future<void> updateRound({
     required String matchId,
     required int roundNumber,
@@ -66,10 +74,9 @@ class MatchRepository {
     });
   }
 
-  /// 画像アップロード情報を更新
+  /// 画像アップロード情報を更新（1ラウンド制用）
   Future<void> updateImageUpload({
     required String matchId,
-    required int roundNumber,
     required String playerId,
     required String imageUrl,
   }) async {
@@ -79,20 +86,16 @@ class MatchRepository {
     }
 
     final isPlayer1 = match.player1 == playerId;
-    final fieldPrefix = 'round$roundNumber';
 
     await _matchesCollection.doc(matchId).update({
-      '$fieldPrefix.${isPlayer1 ? 'player1' : 'player2'}ImageUrl': imageUrl,
-      '$fieldPrefix.${isPlayer1 ? 'player1' : 'player2'}ImageReady': true,
-      '$fieldPrefix.${isPlayer1 ? 'player1' : 'player2'}UploadedAt':
-          Timestamp.now(),
+      '${isPlayer1 ? 'player1' : 'player2'}ImageUrl': imageUrl,
+      '${isPlayer1 ? 'player1' : 'player2'}UploadedAt': Timestamp.now(),
     });
   }
 
-  /// スマイル検出時刻を更新
+  /// スマイル検出時刻を更新（1ラウンド制用）
   Future<void> updateSmileDetected({
     required String matchId,
-    required int roundNumber,
     required String playerId,
   }) async {
     final match = await getMatch(matchId);
@@ -101,11 +104,9 @@ class MatchRepository {
     }
 
     final isPlayer1 = match.player1 == playerId;
-    final fieldPrefix = 'round$roundNumber';
 
     await _matchesCollection.doc(matchId).update({
-      '$fieldPrefix.${isPlayer1 ? 'player1' : 'player2'}SmileDetectedAt':
-          Timestamp.now(),
+      '${isPlayer1 ? 'player1' : 'player2'}SmileDetectedAt': Timestamp.now(),
     });
   }
 
@@ -128,14 +129,15 @@ class MatchRepository {
     });
   }
 
-  /// マッチを終了し、最終勝者を設定
+  /// マッチを終了し、勝者を設定（1ラウンド制用）
   Future<void> finishMatch({
     required String matchId,
     required String winnerId,
   }) async {
     await _matchesCollection.doc(matchId).update({
       'status': 'finished',
-      'finalWinner': winnerId,
+      'winner': winnerId,
+      'gameEndedAt': Timestamp.now(),
       'finishedAt': Timestamp.now(),
     });
   }
