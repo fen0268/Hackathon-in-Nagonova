@@ -22,4 +22,3 @@ class AppState extends ConsumerState<App> {
     );
   }
 }
-
