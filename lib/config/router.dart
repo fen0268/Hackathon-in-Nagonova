@@ -3,41 +3,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../feature/auth/auth_page.dart';
-import '../feature/auth/service/auth_provider.dart';
+import '../feature/auth/nickname_registration_page.dart';
 import '../feature/game/game_page.dart';
 import '../feature/home/home_page.dart';
 import '../feature/matching/matching_page.dart';
 import '../feature/ranking/ranking_page.dart';
 import '../feature/result/result_page.dart';
+import '../feature/settings/settings_page.dart';
 
 final Provider<GoRouter> routerProvider = Provider((ref) {
-  // 認証状態を監視
-  final isAuthenticated = ref.watch(authStateProvider);
-
   return GoRouter(
     initialLocation: AuthPage.routeName,
     redirect: (context, state) {
       final isAuthPage = state.matchedLocation == AuthPage.routeName;
+      final isNicknamePage =
+          state.matchedLocation == NicknameRegistrationPage.routeName;
 
-      // 未認証の場合
-      if (!isAuthenticated) {
-        // 認証ページ以外にアクセスしようとしたら認証ページへリダイレクト
-        return isAuthPage ? null : AuthPage.routeName;
+      // 認証ページとニックネーム登録ページは常にアクセス可能
+      if (isAuthPage || isNicknamePage) {
+        return null;
       }
 
-      // 認証済みの場合
-      // 認証ページにいる場合はホームページへリダイレクト
-      if (isAuthPage) {
-        return HomePage.routeName;
-      }
-
-      return null; // リダイレクトなし
+      // その他のページは後でガードする（今は通す）
+      return null;
     },
     routes: [
       GoRoute(
         path: AuthPage.routeName,
         pageBuilder: (context, state) {
           return const MaterialPage(child: AuthPage());
+        },
+      ),
+      GoRoute(
+        path: NicknameRegistrationPage.routeName,
+        pageBuilder: (context, state) {
+          return const MaterialPage(child: NicknameRegistrationPage());
         },
       ),
       GoRoute(
@@ -68,6 +68,12 @@ final Provider<GoRouter> routerProvider = Provider((ref) {
         path: RankingPage.routeName,
         pageBuilder: (context, state) {
           return const MaterialPage(child: RankingPage());
+        },
+      ),
+      GoRoute(
+        path: SettingsPage.routeName,
+        pageBuilder: (context, state) {
+          return const MaterialPage(child: SettingsPage());
         },
       ),
     ],
