@@ -1,18 +1,37 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'auth_service.dart';
 
 part 'auth_provider.g.dart';
 
+/// AuthServiceのProvider
 @riverpod
-class AuthState extends _$AuthState {
-  @override
-  bool build() {
-    // TODO: Firebase Authentication の実装後、実際の認証状態を返す
-    // 現在は仮実装として false を返す
-    return false;
-  }
+AuthService authService(Ref ref) {
+  return AuthService();
+}
 
-  // 認証状態を更新するメソッド（実装時に使用）
-  void setAuthenticated(bool isAuthenticated) {
-    state = isAuthenticated;
-  }
+/// 認証状態を監視するProvider
+@riverpod
+Stream<User?> authStateChanges(Ref ref) {
+  final authService = ref.watch(authServiceProvider);
+  return authService.authStateChanges;
+}
+
+/// ユーザーが認証済みかどうかを返すProvider
+@riverpod
+bool authState(Ref ref) {
+  final authStateStream = ref.watch(authStateChangesProvider);
+  return authStateStream.when(
+    data: (user) => user != null,
+    loading: () => false,
+    error: (_, __) => false,
+  );
+}
+
+/// ニックネームが登録済みかどうかを返すProvider
+@riverpod
+Future<bool> hasNickname(Ref ref) async {
+  final authService = ref.watch(authServiceProvider);
+  return authService.hasNickname();
 }
