@@ -4,7 +4,13 @@
       "Bash(mkdir:*)",
       "Bash(fvm flutter pub run build_runner build:*)",
       "Bash(fvm flutter run:*)",
-      "Bash(nc localhost 12345)"
+      "Bash(nc localhost 12345)",
+      "Bash(tree:*)",
+      "Bash(fvm flutter pub:*)",
+      "Bash(fvm flutter analyze:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
