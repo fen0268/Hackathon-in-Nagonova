@@ -65,10 +65,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBMtpPkspzB3T7A-4nAbH7DS7MNkGcOG8w',
-    appId: '1:932995165005:ios:65b6036767fd80b0a1e504',
+    appId: '1:932995165005:ios:33938718b72d38e7a1e504',
     messagingSenderId: '932995165005',
     projectId: 'hackathon-in-nagonova',
     storageBucket: 'hackathon-in-nagonova.firebasestorage.app',
-    iosBundleId: 'com.fenc0268.hackathonApp',
+    iosBundleId: 'com.fenc0268.nagonovaHackathon.hackathonApp',
   );
 }

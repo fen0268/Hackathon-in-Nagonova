@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.fenc0268.hackathonApp</string>
+	<string>com.fenc0268.nagonovaHackathon.hackathonApp</string>
 	<key>PROJECT_ID</key>
 	<string>hackathon-in-nagonova</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:932995165005:ios:65b6036767fd80b0a1e504</string>
+	<string>1:932995165005:ios:33938718b72d38e7a1e504</string>
 </dict>
 </plist>

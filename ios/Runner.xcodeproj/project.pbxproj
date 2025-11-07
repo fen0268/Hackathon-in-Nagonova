@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CB1D63F2EBE3C6700D42371 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0CB1D63D2EBE3C6600D42371 /* README.md */; };
+		0CB1D6412EBE3C7300D42371 /* NativeCameraHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB1D6402EBE3C7300D42371 /* NativeCameraHandler.swift */; };
+		0CB1D6432EBE3C7F00D42371 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0CB1D6422EBE3C7F00D42371 /* GoogleService-Info.plist */; };
+		0CB1D6492EBE3C9300D42371 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CB1D6472EBE3C9300D42371 /* Main.storyboard */; };
+		0CB1D64A2EBE3C9300D42371 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CB1D6452EBE3C9300D42371 /* LaunchScreen.storyboard */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -44,6 +49,11 @@
 
 /* Begin PBXFileReference section */
 		0906926C09DDEA3B969A396F /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0CB1D63D2EBE3C6600D42371 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0CB1D6402EBE3C7300D42371 /* NativeCameraHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCameraHandler.swift; sourceTree = "<group>"; };
+		0CB1D6422EBE3C7F00D42371 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0CB1D6442EBE3C9300D42371 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0CB1D6462EBE3C9300D42371 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Main.storyboard; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		1925693973CA33EF2A9E55A8 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +99,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0CB1D63E2EBE3C6600D42371 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0CB1D63D2EBE3C6600D42371 /* README.md */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0CB1D6482EBE3C9300D42371 /* Base.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				0CB1D6452EBE3C9300D42371 /* LaunchScreen.storyboard */,
+				0CB1D6472EBE3C9300D42371 /* Main.storyboard */,
+			);
+			path = Base.lproj;
+			sourceTree = "<group>";
+		};
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -142,6 +169,10 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				0CB1D6482EBE3C9300D42371 /* Base.lproj */,
+				0CB1D6422EBE3C7F00D42371 /* GoogleService-Info.plist */,
+				0CB1D6402EBE3C7300D42371 /* NativeCameraHandler.swift */,
+				0CB1D63E2EBE3C6600D42371 /* Resources */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -262,11 +293,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CB1D63F2EBE3C6700D42371 /* README.md in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				0CB1D6492EBE3C9300D42371 /* Main.storyboard in Resources */,
+				0CB1D64A2EBE3C9300D42371 /* LaunchScreen.storyboard in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				76BFA0FBC05864A1DDEA0DAA /* GoogleService-Info.plist in Resources */,
+				0CB1D6432EBE3C7F00D42371 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,6 +415,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CB1D6412EBE3C7300D42371 /* NativeCameraHandler.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
@@ -396,6 +432,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		0CB1D6452EBE3C9300D42371 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0CB1D6442EBE3C9300D42371 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		0CB1D6472EBE3C9300D42371 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0CB1D6462EBE3C9300D42371 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -474,7 +526,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = DBA47CDZ85;
+				DEVELOPMENT_TEAM = 9X3BRC3AF3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
@@ -482,7 +534,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.hackathonApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.nagonovaHackathon.hackathonApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -499,7 +551,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.hackathonApp.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.nagonovaHackathon.hackathonApp.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -517,7 +569,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.hackathonApp.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.nagonovaHackathon.hackathonApp.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -533,7 +585,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.hackathonApp.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.nagonovaHackathon.hackathonApp.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -658,7 +710,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = DBA47CDZ85;
+				DEVELOPMENT_TEAM = 9X3BRC3AF3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
@@ -666,7 +718,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.hackathonApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.nagonovaHackathon.hackathonApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -682,7 +734,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = DBA47CDZ85;
+				DEVELOPMENT_TEAM = 9X3BRC3AF3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
@@ -690,7 +742,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.hackathonApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fenc0268.nagonovaHackathon.hackathonApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

@@ -46,9 +46,8 @@ class NativeCameraHandler: NSObject {
                 return
             }
 
-            let baseOptions = BaseOptions(modelAssetPath: modelPath)
             let options = FaceLandmarkerOptions()
-            options.baseOptions = baseOptions
+            options.baseOptions.modelAssetPath = modelPath
             options.runningMode = .video
             options.numFaces = 1
             options.minFaceDetectionConfidence = 0.5
@@ -217,7 +216,7 @@ class NativeCameraHandler: NSObject {
         var smileScore: Float = 0.0
         var smileCount = 0
 
-        for category in blendshapes {
+        for category in blendshapes.categories {
             if category.categoryName == "mouthSmileLeft" || category.categoryName == "mouthSmileRight" {
                 smileScore += category.score
                 smileCount += 1
