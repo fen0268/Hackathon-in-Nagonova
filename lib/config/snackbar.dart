@@ -58,7 +58,6 @@ class SnackBarService {
     show(
       context,
       message: message,
-      type: SnackBarType.info,
       duration: duration,
     );
   }

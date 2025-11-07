@@ -74,9 +74,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     'ログアウト',
                     style: TextStyle(color: Colors.red),
                   ),
-                  onTap: () {
-                    _showLogoutDialog();
-                  },
+                  onTap: _showLogoutDialog,
                 ),
               ],
             ),

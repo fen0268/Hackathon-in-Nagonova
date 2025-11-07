@@ -53,4 +53,4 @@ final class SnackBarServiceProvider
   }
 }
 
-String _$snackBarServiceHash() => r'61ef376c250aa2ae98d51eb92a845760e16d30c5';
+String _$snackBarServiceHash() => r'18ed92896486d58b915b984f9bda74343086e900';

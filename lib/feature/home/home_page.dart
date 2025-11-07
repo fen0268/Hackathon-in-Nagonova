@@ -39,7 +39,7 @@ class HomePageState extends ConsumerState<HomePage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,7 +58,7 @@ class HomePageState extends ConsumerState<HomePage> {
               // ユーザー統計情報カード
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
                       const Text(

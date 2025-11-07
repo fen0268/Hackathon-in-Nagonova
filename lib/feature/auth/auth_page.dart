@@ -58,7 +58,7 @@ class AuthPageState extends ConsumerState<AuthPage> {
       if (mounted) {
         context.go(NicknameRegistrationPage.routeName);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       setState(() {
         _errorMessage = '認証に失敗しました: $e';
         _isLoading = false;
@@ -71,37 +71,37 @@ class AuthPageState extends ConsumerState<AuthPage> {
     return Scaffold(
       body: Center(
         child: _isLoading
-            ? Column(
+            ? const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
                   Text('認証中...'),
                 ],
               )
             : _errorMessage != null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: _checkAuthAndNavigate,
-                        child: const Text('再試行'),
-                      ),
-                    ],
-                  )
-                : const Text('読み込み中...'),
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    _errorMessage!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _checkAuthAndNavigate,
+                    child: const Text('再試行'),
+                  ),
+                ],
+              )
+            : const Text('読み込み中...'),
       ),
     );
   }

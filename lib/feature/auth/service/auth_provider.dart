@@ -25,13 +25,13 @@ bool authState(Ref ref) {
   return authStateStream.when(
     data: (user) => user != null,
     loading: () => false,
-    error: (_, __) => false,
+    error: (_, _) => false,
   );
 }
 
 /// ニックネームが登録済みかどうかを返すProvider
 @riverpod
-Future<bool> hasNickname(Ref ref) async {
+Future<bool> hasNickname(Ref ref) {
   final authService = ref.watch(authServiceProvider);
   return authService.hasNickname();
 }

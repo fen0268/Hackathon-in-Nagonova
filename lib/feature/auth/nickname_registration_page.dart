@@ -43,7 +43,7 @@ class _NicknameRegistrationPageState
       if (mounted) {
         context.go(HomePage.routeName);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -66,7 +66,7 @@ class _NicknameRegistrationPageState
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
