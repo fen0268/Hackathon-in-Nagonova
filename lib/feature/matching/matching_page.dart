@@ -50,7 +50,7 @@ class MatchingPageState extends ConsumerState<MatchingPage>
       (previous, next) {
         if (next.status == MatchmakingStatus.matched && next.matchId != null) {
           // 対戦画面に遷移
-          context.go(GamePage.routeName);
+          context.go('${GamePage.routeName}/${next.matchId}');
         }
 
         if (next.status == MatchmakingStatus.error) {

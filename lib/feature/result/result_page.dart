@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ResultPage extends ConsumerStatefulWidget {
-  const ResultPage({super.key});
+  const ResultPage({this.matchId, super.key});
 
+  final String? matchId;
   static const routeName = '/result';
 
   @override

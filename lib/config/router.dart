@@ -53,15 +53,20 @@ final Provider<GoRouter> routerProvider = Provider((ref) {
         },
       ),
       GoRoute(
-        path: GamePage.routeName,
+        path: '${GamePage.routeName}/:matchId',
         pageBuilder: (context, state) {
-          return const MaterialPage(child: GamePage());
+          final matchId = state.pathParameters['matchId'] ?? '';
+          return MaterialPage(child: GamePage(matchId: matchId));
         },
       ),
       GoRoute(
         path: ResultPage.routeName,
         pageBuilder: (context, state) {
-          return const MaterialPage(child: ResultPage());
+          final extra = state.extra as Map<String, dynamic>?;
+          final matchId = extra?['matchId'] as String?;
+          return MaterialPage(
+            child: ResultPage(matchId: matchId),
+          );
         },
       ),
       GoRoute(
