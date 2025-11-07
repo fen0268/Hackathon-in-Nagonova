@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(fvm flutter pub run build_runner build:*)"
+      "Bash(fvm flutter pub run build_runner build:*)",
+      "Bash(fvm flutter run:*)",
+      "Bash(nc localhost 12345)"
     ],
     "deny": [],
     "ask": []
