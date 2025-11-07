@@ -58,14 +58,17 @@ class NativeCameraService {
   /// countdownSeconds: カウントダウン秒数（デフォルト5秒）
   Future<void> startCameraWithCountdown({int countdownSeconds = 5}) async {
     try {
+      print('[NativeCameraService] カメラ起動開始: $countdownSeconds秒');
       _state = NativeCameraState.preparing;
 
       await _methodChannel.invokeMethod('startCamera', {
         'countdownSeconds': countdownSeconds,
       });
 
-      _state = NativeCameraState.countdown;
+      print('[NativeCameraService] カメラ起動完了（撮影完了通知を受信）');
+      _state = NativeCameraState.captured;
     } on PlatformException catch (e) {
+      print('[NativeCameraService] カメラ起動エラー: ${e.message}');
       throw Exception('Failed to start camera: ${e.message}');
     }
   }
@@ -123,11 +126,14 @@ class NativeCameraService {
   /// 撮影した画像のパスを取得
   Future<String?> getCapturedImagePath() async {
     try {
+      print('[NativeCameraService] 撮影画像パス取得中...');
       final path = await _methodChannel.invokeMethod<String>(
         'getCapturedImagePath',
       );
+      print('[NativeCameraService] 撮影画像パス: $path');
       return path;
     } on PlatformException catch (e) {
+      print('[NativeCameraService] 画像パス取得エラー: ${e.message}');
       throw Exception('Failed to get captured image path: ${e.message}');
     }
   }
