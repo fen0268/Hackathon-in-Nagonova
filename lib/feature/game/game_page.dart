@@ -1,192 +1,119 @@
-import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hackathon_app/feature/game/service/native_camera_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hackathon_app/feature/auth/service/auth_provider.dart';
+import 'package:hackathon_app/feature/game/service/game_state_provider.dart';
+import 'package:hackathon_app/feature/result/result_page.dart';
 
 class GamePage extends ConsumerStatefulWidget {
-  const GamePage({super.key});
+  const GamePage({required this.matchId, super.key});
 
+  final String matchId;
   static const routeName = '/game';
 
   @override
-  ConsumerState<GamePage> createState() => GamePageState();
+  ConsumerState<GamePage> createState() => _GamePageState();
 }
 
-class GamePageState extends ConsumerState<GamePage> {
-  final NativeCameraService _cameraService = NativeCameraService();
-
-  // ゲーム状態
-  GamePhase _currentPhase = GamePhase.ready;
-  int _countdown = 5;
-  Timer? _countdownTimer;
-  Timer? _judgementTimer;
-  int _judgementTimeRemaining = 15;
-  bool _isPlayerSmiling = false;
-
+class _GamePageState extends ConsumerState<GamePage> {
   @override
   void initState() {
     super.initState();
-
-    // 笑顔判定結果を監視
-    _cameraService.listenToSmileDetection((result) {
+    // ゲーム開始を少し遅延させてUIが準備できるまで待つ
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        setState(() {
-          _isPlayerSmiling = result.isSmiling;
-        });
-
-        // 笑顔を検知したら負け
-        if (result.isSmiling && _currentPhase == GamePhase.judging) {
-          _onPlayerLost();
-        }
+        ref
+            .read(gameStateProvider(widget.matchId).notifier)
+            .startGame();
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _countdownTimer?.cancel();
-    _judgementTimer?.cancel();
-    _cameraService.dispose();
-    super.dispose();
-  }
-
-  Future<void> _startGame() async {
-    setState(() {
-      _currentPhase = GamePhase.countdown;
-      _countdown = 5;
-    });
-
-    // カウントダウンタイマー開始
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _countdown--;
-      });
-
-      if (_countdown == 0) {
-        timer.cancel();
-        _onCountdownComplete();
-      }
-    });
-
-    // ネイティブカメラ起動（カウントダウン付き）
-    try {
-      await _cameraService.startCameraWithCountdown();
-    } on Exception catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('カメラの起動に失敗しました: $e')),
-        );
-      }
-    }
-  }
-
-  void _onCountdownComplete() {
-    setState(() {
-      _currentPhase = GamePhase.captured;
-    });
-
-    // 3秒待機後に判定開始
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        _startJudgement();
-      }
-    });
-  }
-
-  Future<void> _startJudgement() async {
-    setState(() {
-      _currentPhase = GamePhase.judging;
-      _judgementTimeRemaining = 15;
-    });
-
-    // 笑顔判定開始
-    await _cameraService.startSmileDetection();
-
-    // 判定タイマー（15秒）
-    _judgementTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _judgementTimeRemaining--;
-      });
-
-      if (_judgementTimeRemaining == 0) {
-        timer.cancel();
-        _onTimeUp();
-      }
-    });
-  }
-
-  void _onPlayerLost() {
-    _judgementTimer?.cancel();
-    _cameraService.stopSmileDetection();
-
-    setState(() {
-      _currentPhase = GamePhase.result;
-    });
-
-    _showResultDialog(won: false);
-  }
-
-  void _onTimeUp() {
-    _cameraService.stopSmileDetection();
-
-    setState(() {
-      _currentPhase = GamePhase.result;
-    });
-
-    _showResultDialog(won: true);
-  }
-
-  void _showResultDialog({required bool won}) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text(won ? '勝利！' : '敗北...'),
-        content: Text(won
-          ? 'おめでとうございます！笑わずに勝ちました！'
-          : '笑顔を検出しました。残念...'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // ゲーム画面を閉じる
-            },
-            child: const Text('ホームに戻る'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final gameState = ref.watch(gameStateProvider(widget.matchId));
+
+    // 状態がまだ初期化されていない場合
+    if (gameState == null) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
+    // エラーがある場合
+    if (gameState.error != null) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.red, size: 64),
+              const SizedBox(height: 16),
+              Text(
+                'エラーが発生しました',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                gameState.error!,
+                style: const TextStyle(color: Colors.white70),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => context.pop(),
+                child: const Text('ホームに戻る'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // ゲーム終了時は結果画面へ遷移
+    if (gameState.phase == GamePhase.finished) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.pushReplacement(
+            ResultPage.routeName,
+            extra: {'matchId': widget.matchId},
+          );
+        }
+      });
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Stack(
           children: [
-            // カメラプレビュー（ネイティブ側で表示される）
-            Container(
-              color: Colors.black,
-            ),
-
-            // UI オーバーレイ
+            // メインコンテンツ
             Column(
               children: [
-                // ヘッダー
-                _buildHeader(),
-
-                const Spacer(),
-
-                // メインコンテンツ
-                _buildMainContent(),
-
-                const Spacer(),
-
-                // フッター（ボタン等）
-                _buildFooter(),
+                _buildHeader(gameState),
+                Expanded(
+                  child: _buildMainContent(gameState),
+                ),
               ],
+            ),
+
+            // 戻るボタン
+            Positioned(
+              top: 16,
+              left: 16,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () {
+                  _showQuitDialog();
+                },
+              ),
             ),
           ],
         ),
@@ -194,17 +121,26 @@ class GamePageState extends ConsumerState<GamePage> {
     );
   }
 
-  Widget _buildHeader() {
+  /// ヘッダー部分（ラウンド表示、残り時間など）
+  Widget _buildHeader(GameState gameState) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
+          // ラウンド表示
+          Text(
+            'ラウンド ${gameState.currentRound}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          if (_currentPhase == GamePhase.judging)
+          const SizedBox(height: 8),
+
+          // フェーズに応じた情報表示
+          if (gameState.phase == GamePhase.round1Playing ||
+              gameState.phase == GamePhase.round2Playing)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -212,7 +148,24 @@ class GamePageState extends ConsumerState<GamePage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '残り時間: $_judgementTimeRemaining秒',
+                '残り時間: ${gameState.playingTimeRemaining}秒',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          else if (gameState.phase == GamePhase.round1Preparing ||
+              gameState.phase == GamePhase.round2Preparing)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '準備完了待ち: ${gameState.preparingTimeoutRemaining}秒',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -225,169 +178,321 @@ class GamePageState extends ConsumerState<GamePage> {
     );
   }
 
-  Widget _buildMainContent() {
-    switch (_currentPhase) {
-      case GamePhase.ready:
-        return const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '準備はいいですか？',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'スタートボタンを押すと\nカウントダウンが始まります',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        );
+  /// メインコンテンツ（フェーズごとに表示を切り替え）
+  Widget _buildMainContent(GameState gameState) {
+    switch (gameState.phase) {
+      case GamePhase.waiting:
+        return _buildWaitingView();
 
-      case GamePhase.countdown:
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '$_countdown',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 120,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '撮影までのカウントダウン',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-        );
+      case GamePhase.round1Countdown:
+      case GamePhase.round2Countdown:
+        return _buildCountdownView(gameState);
 
-      case GamePhase.captured:
-        return const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: 80,
-              ),
-              SizedBox(height: 16),
-              Text(
-                '撮影完了！',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'まもなくにらめっこ開始...',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        );
+      case GamePhase.round1Preparing:
+      case GamePhase.round2Preparing:
+        return _buildPreparingView(gameState);
 
-      case GamePhase.judging:
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: _isPlayerSmiling ? Colors.red : Colors.green,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _isPlayerSmiling
-                      ? Icons.sentiment_very_satisfied
-                      : Icons.sentiment_neutral,
-                  color: Colors.white,
-                  size: 80,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                _isPlayerSmiling ? '笑顔を検出中...' : '真顔を保持中',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '笑わないようにしてください！',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        );
+      case GamePhase.round1CountdownToDisplay:
+      case GamePhase.round2CountdownToDisplay:
+        return _buildDisplayCountdownView(gameState);
 
-      case GamePhase.result:
-        return const Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        );
+      case GamePhase.round1Playing:
+      case GamePhase.round2Playing:
+        return _buildPlayingView(gameState);
+
+      case GamePhase.finished:
+        return _buildFinishedView();
     }
   }
 
-  Widget _buildFooter() {
-    if (_currentPhase == GamePhase.ready) {
-      return Padding(
-        padding: const EdgeInsets.all(24),
-        child: ElevatedButton(
-          onPressed: _startGame,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+  /// 待機中の表示
+  Widget _buildWaitingView() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Colors.white),
+          SizedBox(height: 24),
+          Text(
+            'ゲームを開始しています...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
-          child: const Text(
-            'スタート',
-            style: TextStyle(
-              fontSize: 20,
+        ],
+      ),
+    );
+  }
+
+  /// 撮影前のカウントダウン表示（5→4→3→2→1）
+  Widget _buildCountdownView(GameState gameState) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${gameState.countdown}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 120,
               fontWeight: FontWeight.bold,
             ),
           ),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
+          const SizedBox(height: 16),
+          const Text(
+            '撮影までのカウントダウン',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'カメラに向かって面白い顔を作ろう！',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
   }
-}
 
-enum GamePhase {
-  ready,      // 準備中
-  countdown,  // カウントダウン中
-  captured,   // 撮影完了
-  judging,    // 判定中
-  result,     // 結果表示
+  /// 準備中の表示（画像アップロード待ち）
+  Widget _buildPreparingView(GameState gameState) {
+    final roundData = gameState.currentRoundData;
+    final currentUserId = ref.watch(authStateChangesProvider).value?.uid ?? '';
+    final isPlayer1 = gameState.isPlayer1(currentUserId);
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(color: Colors.white),
+          const SizedBox(height: 24),
+          const Text(
+            '画像をアップロード中...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 両プレイヤーの準備状況
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildPlayerReadyIndicator(
+                'あなた',
+                isPlayer1
+                    ? roundData?.player1ImageReady ?? false
+                    : roundData?.player2ImageReady ?? false,
+              ),
+              const SizedBox(width: 32),
+              _buildPlayerReadyIndicator(
+                '相手',
+                isPlayer1
+                    ? roundData?.player2ImageReady ?? false
+                    : roundData?.player1ImageReady ?? false,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// プレイヤーの準備完了インジケーター
+  Widget _buildPlayerReadyIndicator(String label, bool isReady) {
+    return Column(
+      children: [
+        Icon(
+          isReady ? Icons.check_circle : Icons.hourglass_empty,
+          color: isReady ? Colors.green : Colors.orange,
+          size: 48,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+        Text(
+          isReady ? '準備完了' : '準備中...',
+          style: TextStyle(
+            color: isReady ? Colors.green : Colors.orange,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 画像表示前の3秒カウントダウン
+  Widget _buildDisplayCountdownView(GameState gameState) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${gameState.displayCountdown}',
+            style: const TextStyle(
+              color: Colors.yellow,
+              fontSize: 120,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'まもなくにらめっこ開始！',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            '笑わないように準備して！',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// にらめっこ対戦中の表示
+  Widget _buildPlayingView(GameState gameState) {
+    return Column(
+      children: [
+        // 相手の画像（大きく表示）
+        Expanded(
+          flex: 3,
+          child: Container(
+            width: double.infinity,
+            color: Colors.grey[900],
+            child: gameState.opponentImageUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: gameState.opponentImageUrl!,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(Icons.error, color: Colors.red, size: 48),
+                    ),
+                  )
+                : const Center(
+                    child: Text(
+                      '画像を読み込み中...',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+          ),
+        ),
+
+        // 笑顔判定状態
+        Container(
+          padding: const EdgeInsets.all(16),
+          color: gameState.isPlayerSmiling ? Colors.red[900] : Colors.green[900],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                gameState.isPlayerSmiling
+                    ? Icons.sentiment_very_satisfied
+                    : Icons.sentiment_neutral,
+                color: Colors.white,
+                size: 32,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                gameState.isPlayerSmiling ? '笑顔を検出中...' : '真顔を保持中',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // カメラプレビュー（小さく表示）
+        Expanded(
+          flex: 2,
+          child: Container(
+            width: double.infinity,
+            color: Colors.black,
+            child: const Center(
+              child: Text(
+                'カメラプレビュー\n（ネイティブ実装）',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 終了時の表示
+  Widget _buildFinishedView() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Colors.white),
+          SizedBox(height: 24),
+          Text(
+            'ゲーム終了\n結果を集計中...',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 終了確認ダイアログ
+  void _showQuitDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('ゲームを終了しますか？'),
+        content: const Text('ゲームを中断すると負けとなります。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ref
+                  .read(gameStateProvider(widget.matchId).notifier)
+                  .quitGame();
+              context.pop();
+            },
+            child: const Text('終了', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
 }
