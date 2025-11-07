@@ -1,15 +1,17 @@
-
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-final routerProvider = Provider((ref) {
+import '../feature/home/home_page.dart';
+
+final Provider<GoRouter> routerProvider = Provider((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: HomePage.routeName,
     routes: [
       GoRoute(
-        path: '/',
-        builder: (context, state) {
-          return const HomePage();
+        path: HomePage.routeName,
+        pageBuilder: (context, state) {
+          return const MaterialPage(child: HomePage());
         },
       ),
     ],
