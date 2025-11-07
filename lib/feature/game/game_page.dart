@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon_app/feature/auth/service/auth_provider.dart';
+import 'package:hackathon_app/feature/game/component/native_camera_view.dart';
 import 'package:hackathon_app/feature/game/service/game_state_provider.dart';
 import 'package:hackathon_app/feature/result/result_page.dart';
 
@@ -16,27 +16,12 @@ class GamePage extends ConsumerStatefulWidget {
   ConsumerState<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends ConsumerState<GamePage>
-    with TickerProviderStateMixin {
-  late AnimationController _countdownAnimationController;
-  late Animation<double> _countdownScaleAnimation;
+class _GamePageState extends ConsumerState<GamePage> {
+  bool _hasNavigatedToResult = false;
 
   @override
   void initState() {
     super.initState();
-
-    // カウントダウンアニメーションの初期化
-    _countdownAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _countdownScaleAnimation = Tween<double>(begin: 0.5, end: 1).animate(
-      CurvedAnimation(
-        parent: _countdownAnimationController,
-        curve: Curves.elasticOut,
-      ),
-    );
 
     // ゲーム開始を少し遅延させてUIが準備できるまで待つ
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -47,26 +32,8 @@ class _GamePageState extends ConsumerState<GamePage>
   }
 
   @override
-  void dispose() {
-    _countdownAnimationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider(widget.matchId));
-
-    // カウントダウンが変わったらアニメーション再生
-    ref.listen<GameState>(
-      gameStateProvider(widget.matchId),
-      (previous, next) {
-        if (previous?.countdown != next.countdown &&
-            (next.phase == GamePhase.round1Countdown ||
-                next.phase == GamePhase.round2Countdown)) {
-          _countdownAnimationController.forward(from: 0);
-        }
-      },
-    );
 
     // エラーがある場合
     if (gameState.error != null) {
@@ -101,8 +68,9 @@ class _GamePageState extends ConsumerState<GamePage>
       );
     }
 
-    // ゲーム終了時は結果画面へ遷移
-    if (gameState.phase == GamePhase.finished) {
+    // ゲーム終了時は結果画面へ遷移（1回のみ）
+    if (gameState.phase == GamePhase.finished && !_hasNavigatedToResult) {
+      _hasNavigatedToResult = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           context.pushReplacement(
@@ -127,44 +95,20 @@ class _GamePageState extends ConsumerState<GamePage>
                 ),
               ],
             ),
-
-            // 戻るボタン
-            Positioned(
-              top: 16,
-              left: 16,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () {
-                  _showQuitDialog();
-                },
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  /// ヘッダー部分（ラウンド表示、残り時間など）
+  /// ヘッダー部分（残り時間など）
   Widget _buildHeader(GameState gameState) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // ラウンド表示
-          Text(
-            'ラウンド ${gameState.currentRound}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-
           // フェーズに応じた情報表示
-          if (gameState.phase == GamePhase.round1Playing ||
-              gameState.phase == GamePhase.round2Playing)
+          if (gameState.phase == GamePhase.playing)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -180,8 +124,7 @@ class _GamePageState extends ConsumerState<GamePage>
                 ),
               ),
             )
-          else if (gameState.phase == GamePhase.round1Preparing ||
-              gameState.phase == GamePhase.round2Preparing)
+          else if (gameState.phase == GamePhase.preparing)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
@@ -189,7 +132,7 @@ class _GamePageState extends ConsumerState<GamePage>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '準備完了待ち: ${gameState.preparingTimeoutRemaining}秒',
+                '準備中: ${gameState.preparingTimeRemaining}秒',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -208,20 +151,13 @@ class _GamePageState extends ConsumerState<GamePage>
       case GamePhase.waiting:
         return _buildWaitingView();
 
-      case GamePhase.round1Countdown:
-      case GamePhase.round2Countdown:
+      case GamePhase.countdown:
         return _buildCountdownView(gameState);
 
-      case GamePhase.round1Preparing:
-      case GamePhase.round2Preparing:
+      case GamePhase.preparing:
         return _buildPreparingView(gameState);
 
-      case GamePhase.round1CountdownToDisplay:
-      case GamePhase.round2CountdownToDisplay:
-        return _buildDisplayCountdownView(gameState);
-
-      case GamePhase.round1Playing:
-      case GamePhase.round2Playing:
+      case GamePhase.playing:
         return _buildPlayingView(gameState);
 
       case GamePhase.finished:
@@ -250,178 +186,16 @@ class _GamePageState extends ConsumerState<GamePage>
   }
 
   /// 撮影前のカウントダウン表示（5→4→3→2→1）
+  /// ネイティブ側でカメラビューとカウントダウンUIを表示
   Widget _buildCountdownView(GameState gameState) {
-    // カウントダウンに応じて色を変化
-    Color getCountdownColor(int countdown) {
-      switch (countdown) {
-        case 5:
-          return Colors.green;
-        case 4:
-          return Colors.lightGreen;
-        case 3:
-          return Colors.yellow;
-        case 2:
-          return Colors.orange;
-        case 1:
-          return Colors.red;
-        default:
-          return Colors.white;
-      }
-    }
-
-    final countdownColor = getCountdownColor(gameState.countdown);
-    final progress = gameState.countdown / 5.0;
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [
-            countdownColor.withOpacity(0.3),
-            Colors.black,
-          ],
-          stops: const [0.0, 0.7],
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 円形プログレスバー付きカウントダウン
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                // 外側のプログレスバー
-                SizedBox(
-                  width: 280,
-                  height: 280,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 12,
-                    backgroundColor: Colors.white.withOpacity(0.2),
-                    valueColor: AlwaysStoppedAnimation<Color>(countdownColor),
-                  ),
-                ),
-
-                // アニメーション付き数字
-                AnimatedBuilder(
-                  animation: _countdownScaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _countdownScaleAnimation.value,
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: countdownColor.withOpacity(0.3),
-                          boxShadow: [
-                            BoxShadow(
-                              color: countdownColor.withOpacity(0.5),
-                              blurRadius: 40,
-                              spreadRadius: 10,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${gameState.countdown}',
-                            style: TextStyle(
-                              color: countdownColor,
-                              fontSize: 140,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(
-                                  color: countdownColor.withOpacity(0.5),
-                                  blurRadius: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 60),
-
-            // 説明テキスト
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: countdownColor.withOpacity(0.3),
-                  width: 2,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '撮影まで',
-                    style: TextStyle(
-                      color: countdownColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'カメラに向かって面白い顔を作ろう！',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            // プログレスドット
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                final isActive = index < (5 - gameState.countdown);
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isActive
-                        ? countdownColor
-                        : Colors.white.withOpacity(0.2),
-                    boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                              color: countdownColor.withOpacity(0.5),
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                            ),
-                          ]
-                        : null,
-                  ),
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
+    // ネイティブ側でカウントダウンUIを表示するため、Flutter側はシンプルに表示
+    return const SizedBox.expand(
+      child: NativeCameraView(),
     );
   }
 
-  /// 準備中の表示（画像アップロード待ち）
+  /// 準備中の表示（5秒自動待機）
   Widget _buildPreparingView(GameState gameState) {
-    final roundData = gameState.currentRoundData;
-    final currentUserId = ref.watch(authStateChangesProvider).value?.uid ?? '';
-    final isPlayer1 = gameState.isPlayer1(currentUserId);
-
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -436,88 +210,11 @@ class _GamePageState extends ConsumerState<GamePage>
             ),
           ),
           const SizedBox(height: 16),
-
-          // 両プレイヤーの準備状況
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildPlayerReadyIndicator(
-                'あなた',
-                isPlayer1
-                    ? roundData?.player1ImageReady ?? false
-                    : roundData?.player2ImageReady ?? false,
-              ),
-              const SizedBox(width: 32),
-              _buildPlayerReadyIndicator(
-                '相手',
-                isPlayer1
-                    ? roundData?.player2ImageReady ?? false
-                    : roundData?.player1ImageReady ?? false,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// プレイヤーの準備完了インジケーター
-  Widget _buildPlayerReadyIndicator(String label, bool isReady) {
-    return Column(
-      children: [
-        Icon(
-          isReady ? Icons.check_circle : Icons.hourglass_empty,
-          color: isReady ? Colors.green : Colors.orange,
-          size: 48,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-        Text(
-          isReady ? '準備完了' : '準備中...',
-          style: TextStyle(
-            color: isReady ? Colors.green : Colors.orange,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 画像表示前の3秒カウントダウン
-  Widget _buildDisplayCountdownView(GameState gameState) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
           Text(
-            '${gameState.displayCountdown}',
+            '${gameState.preparingTimeRemaining}秒後に自動的に開始します',
             style: const TextStyle(
-              color: Colors.yellow,
-              fontSize: 120,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'まもなくにらめっこ開始！',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '笑わないように準備して！',
-            style: TextStyle(
               color: Colors.white70,
-              fontSize: 16,
+              fontSize: 14,
             ),
           ),
         ],
@@ -558,7 +255,9 @@ class _GamePageState extends ConsumerState<GamePage>
         // 笑顔判定状態
         Container(
           padding: const EdgeInsets.all(16),
-          color: gameState.isPlayerSmiling ? Colors.red[900] : Colors.green[900],
+          color: gameState.isPlayerSmiling
+              ? Colors.red[900]
+              : Colors.green[900],
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -640,10 +339,8 @@ class _GamePageState extends ConsumerState<GamePage>
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              ref
-                  .read(gameStateProvider(widget.matchId).notifier)
-                  .quitGame();
-              context.pop();
+              ref.read(gameStateProvider(widget.matchId).notifier).quitGame();
+              context.go('/');
             },
             child: const Text('終了', style: TextStyle(color: Colors.red)),
           ),
