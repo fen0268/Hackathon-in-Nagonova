@@ -11,10 +11,8 @@ _MatchModel _$MatchModelFromJson(Map<String, dynamic> json) => _MatchModel(
   player1: json['player1'] as String,
   player2: json['player2'] as String,
   status: json['status'] as String? ?? 'waiting',
-  startedAt: DateTime.parse(json['startedAt'] as String),
-  finishedAt: json['finishedAt'] == null
-      ? null
-      : DateTime.parse(json['finishedAt'] as String),
+  startedAt: const DateTimeConverter().fromJson(json['startedAt'] as Object),
+  finishedAt: const NullableDateTimeConverter().fromJson(json['finishedAt']),
   currentRound: (json['currentRound'] as num?)?.toInt() ?? 1,
   round1: json['round1'] == null
       ? null
@@ -23,20 +21,21 @@ _MatchModel _$MatchModelFromJson(Map<String, dynamic> json) => _MatchModel(
       ? null
       : RoundModel.fromJson(json['round2'] as Map<String, dynamic>),
   finalWinner: json['finalWinner'] as String?,
-  createdAt: DateTime.parse(json['createdAt'] as String),
+  createdAt: const DateTimeConverter().fromJson(json['createdAt'] as Object),
 );
 
-Map<String, dynamic> _$MatchModelToJson(_MatchModel instance) =>
-    <String, dynamic>{
-      'matchId': instance.matchId,
-      'player1': instance.player1,
-      'player2': instance.player2,
-      'status': instance.status,
-      'startedAt': instance.startedAt.toIso8601String(),
-      'finishedAt': instance.finishedAt?.toIso8601String(),
-      'currentRound': instance.currentRound,
-      'round1': instance.round1,
-      'round2': instance.round2,
-      'finalWinner': instance.finalWinner,
-      'createdAt': instance.createdAt.toIso8601String(),
-    };
+Map<String, dynamic> _$MatchModelToJson(
+  _MatchModel instance,
+) => <String, dynamic>{
+  'matchId': instance.matchId,
+  'player1': instance.player1,
+  'player2': instance.player2,
+  'status': instance.status,
+  'startedAt': const DateTimeConverter().toJson(instance.startedAt),
+  'finishedAt': const NullableDateTimeConverter().toJson(instance.finishedAt),
+  'currentRound': instance.currentRound,
+  'round1': instance.round1,
+  'round2': instance.round2,
+  'finalWinner': instance.finalWinner,
+  'createdAt': const DateTimeConverter().toJson(instance.createdAt),
+};

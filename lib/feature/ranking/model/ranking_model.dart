@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hackathon_app/util/datetime_converter.dart';
 
 part 'ranking_model.freezed.dart';
 part 'ranking_model.g.dart';
@@ -11,7 +12,7 @@ abstract class RankingModel with _$RankingModel {
     @Default(0) int totalMatches,
     @Default(0) int wins,
     @Default(0.0) double winRate,
-    required DateTime updatedAt,
+    @DateTimeConverter() required DateTime updatedAt,
   }) = _RankingModel;
 
   factory RankingModel.fromJson(Map<String, dynamic> json) =>

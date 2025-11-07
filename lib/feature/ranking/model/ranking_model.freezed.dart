@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RankingModel {
 
- String get userId; String get nickname; int get totalMatches; int get wins; double get winRate; DateTime get updatedAt;
+ String get userId; String get nickname; int get totalMatches; int get wins; double get winRate;@DateTimeConverter() DateTime get updatedAt;
 /// Create a copy of RankingModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $RankingModelCopyWith<$Res>  {
   factory $RankingModelCopyWith(RankingModel value, $Res Function(RankingModel) _then) = _$RankingModelCopyWithImpl;
 @useResult
 $Res call({
- String userId, String nickname, int totalMatches, int wins, double winRate, DateTime updatedAt
+ String userId, String nickname, int totalMatches, int wins, double winRate,@DateTimeConverter() DateTime updatedAt
 });
 
 
@@ -158,7 +158,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String nickname,  int totalMatches,  int wins,  double winRate,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String nickname,  int totalMatches,  int wins,  double winRate, @DateTimeConverter()  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RankingModel() when $default != null:
 return $default(_that.userId,_that.nickname,_that.totalMatches,_that.wins,_that.winRate,_that.updatedAt);case _:
@@ -179,7 +179,7 @@ return $default(_that.userId,_that.nickname,_that.totalMatches,_that.wins,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String nickname,  int totalMatches,  int wins,  double winRate,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String nickname,  int totalMatches,  int wins,  double winRate, @DateTimeConverter()  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _RankingModel():
 return $default(_that.userId,_that.nickname,_that.totalMatches,_that.wins,_that.winRate,_that.updatedAt);case _:
@@ -199,7 +199,7 @@ return $default(_that.userId,_that.nickname,_that.totalMatches,_that.wins,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String nickname,  int totalMatches,  int wins,  double winRate,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String nickname,  int totalMatches,  int wins,  double winRate, @DateTimeConverter()  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _RankingModel() when $default != null:
 return $default(_that.userId,_that.nickname,_that.totalMatches,_that.wins,_that.winRate,_that.updatedAt);case _:
@@ -214,7 +214,7 @@ return $default(_that.userId,_that.nickname,_that.totalMatches,_that.wins,_that.
 @JsonSerializable()
 
 class _RankingModel implements RankingModel {
-  const _RankingModel({required this.userId, required this.nickname, this.totalMatches = 0, this.wins = 0, this.winRate = 0.0, required this.updatedAt});
+  const _RankingModel({required this.userId, required this.nickname, this.totalMatches = 0, this.wins = 0, this.winRate = 0.0, @DateTimeConverter() required this.updatedAt});
   factory _RankingModel.fromJson(Map<String, dynamic> json) => _$RankingModelFromJson(json);
 
 @override final  String userId;
@@ -222,7 +222,7 @@ class _RankingModel implements RankingModel {
 @override@JsonKey() final  int totalMatches;
 @override@JsonKey() final  int wins;
 @override@JsonKey() final  double winRate;
-@override final  DateTime updatedAt;
+@override@DateTimeConverter() final  DateTime updatedAt;
 
 /// Create a copy of RankingModel
 /// with the given fields replaced by the non-null parameter values.
@@ -257,7 +257,7 @@ abstract mixin class _$RankingModelCopyWith<$Res> implements $RankingModelCopyWi
   factory _$RankingModelCopyWith(_RankingModel value, $Res Function(_RankingModel) _then) = __$RankingModelCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String nickname, int totalMatches, int wins, double winRate, DateTime updatedAt
+ String userId, String nickname, int totalMatches, int wins, double winRate,@DateTimeConverter() DateTime updatedAt
 });
 
 

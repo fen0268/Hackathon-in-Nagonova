@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserModel {
 
- String get userId; String get nickname; DateTime get createdAt; int get totalMatches; int get wins; double get winRate;
+ String get userId; String get nickname;@DateTimeConverter() DateTime get createdAt; int get totalMatches; int get wins; double get winRate;
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $UserModelCopyWith<$Res>  {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) _then) = _$UserModelCopyWithImpl;
 @useResult
 $Res call({
- String userId, String nickname, DateTime createdAt, int totalMatches, int wins, double winRate
+ String userId, String nickname,@DateTimeConverter() DateTime createdAt, int totalMatches, int wins, double winRate
 });
 
 
@@ -158,7 +158,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String nickname,  DateTime createdAt,  int totalMatches,  int wins,  double winRate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String nickname, @DateTimeConverter()  DateTime createdAt,  int totalMatches,  int wins,  double winRate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.userId,_that.nickname,_that.createdAt,_that.totalMatches,_that.wins,_that.winRate);case _:
@@ -179,7 +179,7 @@ return $default(_that.userId,_that.nickname,_that.createdAt,_that.totalMatches,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String nickname,  DateTime createdAt,  int totalMatches,  int wins,  double winRate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String nickname, @DateTimeConverter()  DateTime createdAt,  int totalMatches,  int wins,  double winRate)  $default,) {final _that = this;
 switch (_that) {
 case _UserModel():
 return $default(_that.userId,_that.nickname,_that.createdAt,_that.totalMatches,_that.wins,_that.winRate);case _:
@@ -199,7 +199,7 @@ return $default(_that.userId,_that.nickname,_that.createdAt,_that.totalMatches,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String nickname,  DateTime createdAt,  int totalMatches,  int wins,  double winRate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String nickname, @DateTimeConverter()  DateTime createdAt,  int totalMatches,  int wins,  double winRate)?  $default,) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.userId,_that.nickname,_that.createdAt,_that.totalMatches,_that.wins,_that.winRate);case _:
@@ -214,12 +214,12 @@ return $default(_that.userId,_that.nickname,_that.createdAt,_that.totalMatches,_
 @JsonSerializable()
 
 class _UserModel implements UserModel {
-  const _UserModel({required this.userId, required this.nickname, required this.createdAt, this.totalMatches = 0, this.wins = 0, this.winRate = 0.0});
+  const _UserModel({required this.userId, required this.nickname, @DateTimeConverter() required this.createdAt, this.totalMatches = 0, this.wins = 0, this.winRate = 0.0});
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  String userId;
 @override final  String nickname;
-@override final  DateTime createdAt;
+@override@DateTimeConverter() final  DateTime createdAt;
 @override@JsonKey() final  int totalMatches;
 @override@JsonKey() final  int wins;
 @override@JsonKey() final  double winRate;
@@ -257,7 +257,7 @@ abstract mixin class _$UserModelCopyWith<$Res> implements $UserModelCopyWith<$Re
   factory _$UserModelCopyWith(_UserModel value, $Res Function(_UserModel) _then) = __$UserModelCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String nickname, DateTime createdAt, int totalMatches, int wins, double winRate
+ String userId, String nickname,@DateTimeConverter() DateTime createdAt, int totalMatches, int wins, double winRate
 });
 
 

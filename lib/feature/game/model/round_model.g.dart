@@ -11,34 +11,30 @@ _RoundModel _$RoundModelFromJson(Map<String, dynamic> json) => _RoundModel(
   player2ImageUrl: json['player2ImageUrl'] as String?,
   player1ImageReady: json['player1ImageReady'] as bool? ?? false,
   player2ImageReady: json['player2ImageReady'] as bool? ?? false,
-  shootingAt: json['shootingAt'] == null
-      ? null
-      : DateTime.parse(json['shootingAt'] as String),
-  player1UploadedAt: json['player1UploadedAt'] == null
-      ? null
-      : DateTime.parse(json['player1UploadedAt'] as String),
-  player2UploadedAt: json['player2UploadedAt'] == null
-      ? null
-      : DateTime.parse(json['player2UploadedAt'] as String),
-  bothReadyAt: json['bothReadyAt'] == null
-      ? null
-      : DateTime.parse(json['bothReadyAt'] as String),
-  displayCountdownStartedAt: json['displayCountdownStartedAt'] == null
-      ? null
-      : DateTime.parse(json['displayCountdownStartedAt'] as String),
-  imagesDisplayedAt: json['imagesDisplayedAt'] == null
-      ? null
-      : DateTime.parse(json['imagesDisplayedAt'] as String),
-  player1SmileDetectedAt: json['player1SmileDetectedAt'] == null
-      ? null
-      : DateTime.parse(json['player1SmileDetectedAt'] as String),
-  player2SmileDetectedAt: json['player2SmileDetectedAt'] == null
-      ? null
-      : DateTime.parse(json['player2SmileDetectedAt'] as String),
+  shootingAt: const NullableDateTimeConverter().fromJson(json['shootingAt']),
+  player1UploadedAt: const NullableDateTimeConverter().fromJson(
+    json['player1UploadedAt'],
+  ),
+  player2UploadedAt: const NullableDateTimeConverter().fromJson(
+    json['player2UploadedAt'],
+  ),
+  bothReadyAt: const NullableDateTimeConverter().fromJson(json['bothReadyAt']),
+  displayCountdownStartedAt: const NullableDateTimeConverter().fromJson(
+    json['displayCountdownStartedAt'],
+  ),
+  imagesDisplayedAt: const NullableDateTimeConverter().fromJson(
+    json['imagesDisplayedAt'],
+  ),
+  player1SmileDetectedAt: const NullableDateTimeConverter().fromJson(
+    json['player1SmileDetectedAt'],
+  ),
+  player2SmileDetectedAt: const NullableDateTimeConverter().fromJson(
+    json['player2SmileDetectedAt'],
+  ),
   winner: json['winner'] as String?,
-  roundEndedAt: json['roundEndedAt'] == null
-      ? null
-      : DateTime.parse(json['roundEndedAt'] as String),
+  roundEndedAt: const NullableDateTimeConverter().fromJson(
+    json['roundEndedAt'],
+  ),
   player1UploadTime: (json['player1UploadTime'] as num?)?.toDouble(),
   player2UploadTime: (json['player2UploadTime'] as num?)?.toDouble(),
   player1ReactionTime: (json['player1ReactionTime'] as num?)?.toDouble(),
@@ -52,17 +48,30 @@ Map<String, dynamic> _$RoundModelToJson(
   'player2ImageUrl': instance.player2ImageUrl,
   'player1ImageReady': instance.player1ImageReady,
   'player2ImageReady': instance.player2ImageReady,
-  'shootingAt': instance.shootingAt?.toIso8601String(),
-  'player1UploadedAt': instance.player1UploadedAt?.toIso8601String(),
-  'player2UploadedAt': instance.player2UploadedAt?.toIso8601String(),
-  'bothReadyAt': instance.bothReadyAt?.toIso8601String(),
-  'displayCountdownStartedAt': instance.displayCountdownStartedAt
-      ?.toIso8601String(),
-  'imagesDisplayedAt': instance.imagesDisplayedAt?.toIso8601String(),
-  'player1SmileDetectedAt': instance.player1SmileDetectedAt?.toIso8601String(),
-  'player2SmileDetectedAt': instance.player2SmileDetectedAt?.toIso8601String(),
+  'shootingAt': const NullableDateTimeConverter().toJson(instance.shootingAt),
+  'player1UploadedAt': const NullableDateTimeConverter().toJson(
+    instance.player1UploadedAt,
+  ),
+  'player2UploadedAt': const NullableDateTimeConverter().toJson(
+    instance.player2UploadedAt,
+  ),
+  'bothReadyAt': const NullableDateTimeConverter().toJson(instance.bothReadyAt),
+  'displayCountdownStartedAt': const NullableDateTimeConverter().toJson(
+    instance.displayCountdownStartedAt,
+  ),
+  'imagesDisplayedAt': const NullableDateTimeConverter().toJson(
+    instance.imagesDisplayedAt,
+  ),
+  'player1SmileDetectedAt': const NullableDateTimeConverter().toJson(
+    instance.player1SmileDetectedAt,
+  ),
+  'player2SmileDetectedAt': const NullableDateTimeConverter().toJson(
+    instance.player2SmileDetectedAt,
+  ),
   'winner': instance.winner,
-  'roundEndedAt': instance.roundEndedAt?.toIso8601String(),
+  'roundEndedAt': const NullableDateTimeConverter().toJson(
+    instance.roundEndedAt,
+  ),
   'player1UploadTime': instance.player1UploadTime,
   'player2UploadTime': instance.player2UploadTime,
   'player1ReactionTime': instance.player1ReactionTime,

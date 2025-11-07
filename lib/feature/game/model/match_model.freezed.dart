@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MatchModel {
 
- String get matchId; String get player1; String get player2; String get status; DateTime get startedAt; DateTime? get finishedAt; int get currentRound; RoundModel? get round1; RoundModel? get round2; String? get finalWinner; DateTime get createdAt;
+ String get matchId; String get player1; String get player2; String get status;@DateTimeConverter() DateTime get startedAt;@NullableDateTimeConverter() DateTime? get finishedAt; int get currentRound; RoundModel? get round1; RoundModel? get round2; String? get finalWinner;@DateTimeConverter() DateTime get createdAt;
 /// Create a copy of MatchModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $MatchModelCopyWith<$Res>  {
   factory $MatchModelCopyWith(MatchModel value, $Res Function(MatchModel) _then) = _$MatchModelCopyWithImpl;
 @useResult
 $Res call({
- String matchId, String player1, String player2, String status, DateTime startedAt, DateTime? finishedAt, int currentRound, RoundModel? round1, RoundModel? round2, String? finalWinner, DateTime createdAt
+ String matchId, String player1, String player2, String status,@DateTimeConverter() DateTime startedAt,@NullableDateTimeConverter() DateTime? finishedAt, int currentRound, RoundModel? round1, RoundModel? round2, String? finalWinner,@DateTimeConverter() DateTime createdAt
 });
 
 
@@ -187,7 +187,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String matchId,  String player1,  String player2,  String status,  DateTime startedAt,  DateTime? finishedAt,  int currentRound,  RoundModel? round1,  RoundModel? round2,  String? finalWinner,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String matchId,  String player1,  String player2,  String status, @DateTimeConverter()  DateTime startedAt, @NullableDateTimeConverter()  DateTime? finishedAt,  int currentRound,  RoundModel? round1,  RoundModel? round2,  String? finalWinner, @DateTimeConverter()  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MatchModel() when $default != null:
 return $default(_that.matchId,_that.player1,_that.player2,_that.status,_that.startedAt,_that.finishedAt,_that.currentRound,_that.round1,_that.round2,_that.finalWinner,_that.createdAt);case _:
@@ -208,7 +208,7 @@ return $default(_that.matchId,_that.player1,_that.player2,_that.status,_that.sta
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String matchId,  String player1,  String player2,  String status,  DateTime startedAt,  DateTime? finishedAt,  int currentRound,  RoundModel? round1,  RoundModel? round2,  String? finalWinner,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String matchId,  String player1,  String player2,  String status, @DateTimeConverter()  DateTime startedAt, @NullableDateTimeConverter()  DateTime? finishedAt,  int currentRound,  RoundModel? round1,  RoundModel? round2,  String? finalWinner, @DateTimeConverter()  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _MatchModel():
 return $default(_that.matchId,_that.player1,_that.player2,_that.status,_that.startedAt,_that.finishedAt,_that.currentRound,_that.round1,_that.round2,_that.finalWinner,_that.createdAt);case _:
@@ -228,7 +228,7 @@ return $default(_that.matchId,_that.player1,_that.player2,_that.status,_that.sta
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String matchId,  String player1,  String player2,  String status,  DateTime startedAt,  DateTime? finishedAt,  int currentRound,  RoundModel? round1,  RoundModel? round2,  String? finalWinner,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String matchId,  String player1,  String player2,  String status, @DateTimeConverter()  DateTime startedAt, @NullableDateTimeConverter()  DateTime? finishedAt,  int currentRound,  RoundModel? round1,  RoundModel? round2,  String? finalWinner, @DateTimeConverter()  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _MatchModel() when $default != null:
 return $default(_that.matchId,_that.player1,_that.player2,_that.status,_that.startedAt,_that.finishedAt,_that.currentRound,_that.round1,_that.round2,_that.finalWinner,_that.createdAt);case _:
@@ -243,20 +243,20 @@ return $default(_that.matchId,_that.player1,_that.player2,_that.status,_that.sta
 @JsonSerializable()
 
 class _MatchModel implements MatchModel {
-  const _MatchModel({required this.matchId, required this.player1, required this.player2, this.status = 'waiting', required this.startedAt, this.finishedAt, this.currentRound = 1, this.round1, this.round2, this.finalWinner, required this.createdAt});
+  const _MatchModel({required this.matchId, required this.player1, required this.player2, this.status = 'waiting', @DateTimeConverter() required this.startedAt, @NullableDateTimeConverter() this.finishedAt, this.currentRound = 1, this.round1, this.round2, this.finalWinner, @DateTimeConverter() required this.createdAt});
   factory _MatchModel.fromJson(Map<String, dynamic> json) => _$MatchModelFromJson(json);
 
 @override final  String matchId;
 @override final  String player1;
 @override final  String player2;
 @override@JsonKey() final  String status;
-@override final  DateTime startedAt;
-@override final  DateTime? finishedAt;
+@override@DateTimeConverter() final  DateTime startedAt;
+@override@NullableDateTimeConverter() final  DateTime? finishedAt;
 @override@JsonKey() final  int currentRound;
 @override final  RoundModel? round1;
 @override final  RoundModel? round2;
 @override final  String? finalWinner;
-@override final  DateTime createdAt;
+@override@DateTimeConverter() final  DateTime createdAt;
 
 /// Create a copy of MatchModel
 /// with the given fields replaced by the non-null parameter values.
@@ -291,7 +291,7 @@ abstract mixin class _$MatchModelCopyWith<$Res> implements $MatchModelCopyWith<$
   factory _$MatchModelCopyWith(_MatchModel value, $Res Function(_MatchModel) _then) = __$MatchModelCopyWithImpl;
 @override @useResult
 $Res call({
- String matchId, String player1, String player2, String status, DateTime startedAt, DateTime? finishedAt, int currentRound, RoundModel? round1, RoundModel? round2, String? finalWinner, DateTime createdAt
+ String matchId, String player1, String player2, String status,@DateTimeConverter() DateTime startedAt,@NullableDateTimeConverter() DateTime? finishedAt, int currentRound, RoundModel? round1, RoundModel? round2, String? finalWinner,@DateTimeConverter() DateTime createdAt
 });
 
 

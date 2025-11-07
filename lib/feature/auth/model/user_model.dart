@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hackathon_app/util/datetime_converter.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -8,7 +9,7 @@ abstract class UserModel with _$UserModel {
   const factory UserModel({
     required String userId,
     required String nickname,
-    required DateTime createdAt,
+    @DateTimeConverter() required DateTime createdAt,
     @Default(0) int totalMatches,
     @Default(0) int wins,
     @Default(0.0) double winRate,

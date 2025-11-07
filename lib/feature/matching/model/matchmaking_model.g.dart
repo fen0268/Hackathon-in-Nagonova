@@ -10,7 +10,9 @@ _MatchmakingModel _$MatchmakingModelFromJson(Map<String, dynamic> json) =>
     _MatchmakingModel(
       userId: json['userId'] as String,
       status: json['status'] as String? ?? 'waiting',
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: const DateTimeConverter().fromJson(
+        json['createdAt'] as Object,
+      ),
       matchedWith: json['matchedWith'] as String?,
       matchId: json['matchId'] as String?,
     );
@@ -19,7 +21,7 @@ Map<String, dynamic> _$MatchmakingModelToJson(_MatchmakingModel instance) =>
     <String, dynamic>{
       'userId': instance.userId,
       'status': instance.status,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': const DateTimeConverter().toJson(instance.createdAt),
       'matchedWith': instance.matchedWith,
       'matchId': instance.matchId,
     };
