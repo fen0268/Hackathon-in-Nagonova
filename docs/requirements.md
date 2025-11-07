@@ -1,113 +1,405 @@
 # にらめっこアプリ 要件定義書
 
-**作成日**: 2025-11-07  
-**アプリ名**: にらめっこ（仮）  
-**使用技術**: Flutter, Firebase, MediaPipe
+**プロジェクト名**: にらめっこ（仮）
+**作成日**: 2025-11-07
+**バージョン**: 1.0
 
 ---
 
-## 📌 概要
+## 1. プロジェクト概要
 
-オンライン上で1対1のにらめっこ対決を行うアプリ。  
-絵文字やエフェクトを活用し、MediaPipeで笑顔判定を行い勝負をつける。
+### 1.1 目的
+若者向けの暇つぶし用1対1オンラインにらめっこ対決アプリの開発。
+ランダムマッチング、リアルタイム対戦、笑顔判定による勝敗決定を実現する。
 
----
+### 1.2 ターゲットユーザー
+- ライトユーザー〜カジュアルゲーマー
+- スマートフォンユーザー（iOS/Android）
+- 暇つぶし・エンタメ目的のユーザー
 
-## 🎯 ターゲット・用途
-
-- **想定ユーザー層**: ライトユーザー、カジュアルゲーマー
-- **対応プラットフォーム**: iOS, Android
-- **利用環境**: スマートフォン（フロントカメラ使用）
-- **利用シーン**: 暇つぶし
-
----
-
-## 🎮 対戦形式
-
-### マッチング方式
-- **ランダムマッチング**
-
-### 接続方式
-- **リアルタイム対戦**（同時接続）
-
-### ゲーム時間
-- **1ゲームあたり60秒**
+### 1.3 MVP仕様
+- 完全無料
+- 匿名認証（ニックネームのみ）
+- ランダムマッチング
+- 1対1対戦
+- 笑顔判定による自動勝敗判定
 
 ---
 
-## 😊 笑顔判定仕様
+## 2. 技術スタック
 
-### 判定基準
-- MediaPipeの笑顔判定を使用
-- 具体的な閾値は実装時に調整
+### 2.1 開発環境
+- **フロントエンド**: Flutter（iOS/Android クロスプラットフォーム）
+- **バックエンド**: Firebase
+  - Authentication（匿名認証）
+  - Firestore（データベース）
+  - Storage（画像保存）
+  - Hosting（Webホスティング）
+- **笑顔判定**: MediaPipe（iOS/Android ネイティブ実装）
+- **アニメーション**: Lottie
 
-### 判定タイミング
-- **常時監視**
-
-### 勝敗判定
-- **笑った時点で即座に勝負終了**
-
-### フェイルセーフ
-- **顔検出失敗時の処理**:
-  - カウントダウン警告（3秒以内に顔を戻さないと負け）
-  - Firebaseの更新が止まって3秒経過 → 自動的に負け判定
-  - いかなるアクシデント（カメラ隠し、画面外、通信遅延など）でも同様の処理
-
----
-
-## 🎨 絵文字・エフェクト機能
-
-### 対戦中のリアルタイムエフェクト
-
-#### 表示方式
-- **案A採用**: 相手の画面全体にポップアップ表示（大きく目立つ）
-
-#### 送信制限
-- **連打防止**: クールタイム制を導入
-- **動的クールタイム**:
-  - 序盤: クールタイム長め
-  - 時間経過とともにクールタイムを短縮
-
-#### 絵文字の種類
-- **方針**: 多ければ多いほど良い
-- **選択方式**: 複数ある中から数個だけ選択してそれだけで戦う形式も検討
-
-#### 使用条件
-- **両者が使える** クールタイムが経過したら送信可能
-
-### 勝敗後の演出
-
-- **勝者側**: 紙吹雪アニメーション + 「Victory!」テキスト（Lottieアニメーション使用）
-- **敗者側**: 画面が少し暗くなる + 「Defeat...」テキスト
-- **引き分け**: 「Draw」表示のみ
+### 2.2 MediaPipe 仕様
+- **実装方式**: iOS（Swift）、Android（Kotlin）のネイティブ実装
+- **笑顔判定閾値**: 0.7
+- **処理フレームレート**: 20fps
+- **判定条件**: 連続3フレーム以上で閾値超過
 
 ---
 
-## 👤 認証・ユーザー管理
+## 3. 主要機能
 
-### ログイン方式
-- **匿名認証**（Firebase Anonymous Authentication）
+### 3.1 認証・ユーザー管理
+- **認証方式**: Firebase Anonymous Authentication
+- **ユーザー情報**:
+  - ニックネーム（ランダム生成 or ユーザー設定）
+  - 累計対戦数
+  - 勝利数
+  - 勝率
 
-### プロフィール
-- **ニックネーム**のみ設定可能
+### 3.2 マッチング機能
+- **方式**: ランダムマッチング
+- **仕様**:
+  - マッチング待機キューに追加
+  - 先着順で2人をペアリング
+  - マッチング成立後、即座に対戦画面へ遷移
+
+### 3.3 対戦機能
+
+#### 3.3.1 対戦フロー
+
+```
+【ラウンド1】
+カウントダウン (5→4→3→2→1→0)
+↓
+撮影（音あり）→ Firebase Storage アップロード
+↓
+準備完了待機（最大10秒）
+  - 10秒以内に準備完了しない場合:
+    - 片方のみ遅延 → その人の負け
+    - 両方遅延 → 引き分け
+  → result 画面
+↓
+両者準備完了 → 3秒カウントダウン (3→2→1)
+↓
+画像表示 + MediaPipe 起動 + にらめっこ開始
+↓
+【勝敗判定】
+  - 笑顔検知（10秒以内）→ 笑った方の負け → result 画面
+  - 10秒経過しても笑わず → ラウンド2 へ
+
+【ラウンド2】
+（ラウンド1と同じフロー）
+↓
+【勝敗判定】
+  - 笑顔検知（10秒以内）→ 笑った方の負け → result 画面
+  - 10秒経過しても笑わず → 引き分け → result 画面
+```
+
+#### 3.3.2 勝敗パターン
+
+| ラウンド1 | ラウンド2 | 最終結果 |
+|---------|---------|--------|
+| player1が笑った | - | player2勝 |
+| player2が笑った | - | player1勝 |
+| タイムアウト負け | - | その結果で終了 |
+| 両者笑わず | player1が笑った | player2勝 |
+| 両者笑わず | player2が笑った | player1勝 |
+| 両者笑わず | タイムアウト負け | その結果で終了 |
+| 両者笑わず | 両者笑わず | 引き分け |
+
+#### 3.3.3 画像仕様
+- **撮影タイミング**: カウントダウン0秒時点（自動撮影、音あり）
+- **画像サイズ**: 640x480 JPEG
+- **画質**: 80%
+- **保存先**: Firebase Storage
+- **保存パス**: `matches/{matchId}/round{N}_player{N}.jpg`
+- **削除ポリシー**: 削除なし（永続保存）
+
+#### 3.3.4 表示仕様
+- **対戦画面レイアウト**:
+  - 相手の静止画（大画面）
+  - 自分のリアルタイムカメラ（小画面）
+  - 笑顔判定状態表示
+  - 残り時間表示
+  - 絵文字ボタン
+
+### 3.4 絵文字・エフェクト機能
+- **仕様**:
+  - 絵文字・エフェクトボタン（画面下部）
+  - タップで全画面ポップアップ表示（1秒間）
+  - 動的クールタイム（使用頻度に応じて延長）
+  - 相手画面にもリアルタイム表示
+- **目的**: 相手を笑わせる戦略要素
+
+### 3.5 ランキング機能
+- **表示内容**:
+  - 全体ランキング（勝率順）
+  - ユーザーニックネーム
+  - 累計対戦数
+  - 勝利数
+  - 勝率
+- **更新頻度**: リアルタイム（Firestore リアルタイム集計）
+
+### 3.6 結果画面
+- **表示内容**:
+  - 勝敗結果
+  - 対戦相手のニックネーム
+  - 統計情報（反応速度など）
+  - 再戦ボタン
+  - ホームに戻るボタン
+- **アニメーション**: Lottie による勝利/敗北演出
 
 ---
 
-## 💰 マネタイズ
+## 4. データベース設計
 
-- **収益モデル**: 完全無料
+### 4.1 Firestore コレクション
+
+#### 4.1.1 users コレクション
+```javascript
+{
+  userId: "auto-generated",
+  nickname: "ユーザー123",
+  createdAt: timestamp,
+  totalMatches: 0,
+  wins: 0,
+  winRate: 0.0
+}
+```
+
+#### 4.1.2 matches コレクション
+```javascript
+{
+  matchId: "auto-generated",
+  player1: "userId1",
+  player2: "userId2",
+  
+  status: "waiting",  
+  // waiting | round1_countdown | round1_preparing | 
+  // round1_countdown_to_display | round1_playing | 
+  // round2_countdown | round2_preparing | 
+  // round2_countdown_to_display | round2_playing | finished
+  
+  startedAt: timestamp,
+  finishedAt: null,
+  currentRound: 1,
+  
+  // ラウンド1
+  round1: {
+    // 画像
+    player1ImageUrl: null,
+    player2ImageUrl: null,
+    player1ImageReady: false,
+    player2ImageReady: false,
+    
+    // タイミング
+    shootingAt: null,                  // 撮影時刻（カウントダウン0）
+    player1UploadedAt: null,           // アップロード完了時刻
+    player2UploadedAt: null,
+    bothReadyAt: null,                 // 両者準備完了時刻
+    displayCountdownStartedAt: null,   // 3秒カウント開始時刻
+    imagesDisplayedAt: null,           // 画像表示時刻
+    
+    // 笑顔判定
+    player1SmileDetectedAt: null,
+    player2SmileDetectedAt: null,
+    
+    // 結果
+    winner: null,  
+    // "player1" | "player2" | "none" | 
+    // "timeout_player1" | "timeout_player2" | "timeout_draw"
+    roundEndedAt: null,
+    
+    // 統計
+    player1UploadTime: null,           // 撮影→アップロード (秒)
+    player2UploadTime: null,
+    player1ReactionTime: null,         // 画像表示→笑顔検知 (秒)
+    player2ReactionTime: null
+  },
+  
+  // ラウンド2
+  round2: {
+    // round1 と同じ構造
+    player1ImageUrl: null,
+    player2ImageUrl: null,
+    player1ImageReady: false,
+    player2ImageReady: false,
+    shootingAt: null,
+    player1UploadedAt: null,
+    player2UploadedAt: null,
+    bothReadyAt: null,
+    displayCountdownStartedAt: null,
+    imagesDisplayedAt: null,
+    player1SmileDetectedAt: null,
+    player2SmileDetectedAt: null,
+    winner: null,
+    roundEndedAt: null,
+    player1UploadTime: null,
+    player2UploadTime: null,
+    player1ReactionTime: null,
+    player2ReactionTime: null
+  },
+  
+  // 最終結果
+  finalWinner: null,  // "player1" | "player2" | "draw"
+  
+  createdAt: timestamp
+}
+```
+
+#### 4.1.3 matchmaking コレクション
+```javascript
+{
+  userId: "userId1",
+  status: "waiting",  // waiting | matched
+  createdAt: timestamp,
+  matchedWith: null,
+  matchId: null
+}
+```
+
+#### 4.1.4 rankings コレクション
+```javascript
+{
+  userId: "userId1",
+  nickname: "ユーザー123",
+  totalMatches: 10,
+  wins: 7,
+  winRate: 0.7,
+  updatedAt: timestamp
+}
+```
 
 ---
 
-## 🏆 ランキング機能
+## 5. 画面遷移
 
-### ランキングの種類
-- **全体ランキング**
+```
+起動
+↓
+auth_page（匿名認証）
+↓
+home_page（ホーム画面）
+├─ マッチング開始 → マッチング待機 → game_page
+├─ ランキング表示
+└─ 設定
+↓
+game_page（対戦画面）
+├─ カウントダウン
+├─ 準備待機
+├─ 3秒カウント
+├─ にらめっこ対戦
+└─ 勝敗判定
+↓
+result_page（結果画面）
+├─ 再戦 → マッチング待機
+└─ ホームに戻る → home_page
+```
 
-### 表示情報
-- **ニックネーム**
-- **勝利数**
-- **勝率**（勝利数 / 総対戦数）
+---
 
-### データ管理
-- **Firestoreでリアルタイム集計**
+## 6. 技術検証項目
+
+### 6.1 優先度A（MVP必須）
+1. **MediaPipe 笑顔判定の精度検証**
+   - Flutter プラグイン統合
+   - 閾値調整（0.7 → 最適値探索）
+   - 処理速度（20fps 目標）
+
+2. **Firebase Storage アップロード速度**
+   - 画像サイズ: 640x480 JPEG（品質80）
+   - 想定転送時間: 1〜2秒
+   - エラーハンドリング
+
+3. **Firestore リアルタイム同期レイテンシ**
+   - 準備完了フラグ監視
+   - 両者の同期ずれ許容範囲: ±500ms
+
+### 6.2 優先度B（リリース前推奨）
+4. **カメラ撮影音の実装**
+   - iOS/Android それぞれの実装確認
+
+5. **3秒カウントダウンのタイミング精度**
+   - 両者の同期精度検証
+
+### 6.3 優先度C（改善フェーズ）
+6. **画像圧縮最適化**
+   - 転送速度 vs 画質のバランス調整
+
+7. **ランキングのパフォーマンス最適化**
+   - 大量ユーザー時の集計速度
+
+---
+
+## 7. 非機能要件
+
+### 7.1 パフォーマンス
+- 笑顔判定: 20fps
+- マッチング時間: 30秒以内
+- 画像アップロード: 10秒以内
+
+### 7.2 セキュリティ
+- Firebase Security Rules によるデータアクセス制御
+- 匿名認証によるユーザー識別
+
+### 7.3 スケーラビリティ
+- Firestore 自動スケーリング
+- Firebase Storage CDN 配信
+
+---
+
+## 8. 今後の拡張可能性
+
+### 8.1 追加機能候補
+- フレンド機能
+- プライベートマッチ
+- アバター・カスタマイズ
+- リプレイ機能
+- ボイスチャット
+
+### 8.2 収益化
+- 広告表示
+- プレミアム機能（絵文字追加など）
+
+---
+
+## 9. 開発スケジュール（仮）
+
+| フェーズ | 期間 | 内容 |
+|---------|------|------|
+| 技術検証 | 1週間 | MediaPipe統合、Firebase検証 |
+| 基本機能開発 | 2週間 | 認証、マッチング、対戦画面 |
+| 判定機能開発 | 1週間 | 笑顔判定、勝敗ロジック |
+| UI/UX調整 | 1週間 | デザイン、アニメーション |
+| テスト | 1週間 | 総合テスト、バグ修正 |
+| リリース準備 | 3日 | ストア申請、ドキュメント整備 |
+
+**合計**: 約6週間
+
+---
+
+## 10. リスク管理
+
+### 10.1 技術リスク
+- **MediaPipe の精度問題**: 閾値調整、代替ライブラリ検討
+- **Firebase 遅延**: タイムアウト処理の実装
+- **クロスプラットフォーム互換性**: iOS/Android 個別対応
+
+### 10.2 ユーザー体験リスク
+- **マッチング待機時間長期化**: ボット対戦の検討
+- **不適切行為**: 報告機能、運営監視
+
+---
+
+## 付録
+
+### A. 用語集
+- **MVP**: Minimum Viable Product（実用最小限の製品）
+- **MediaPipe**: Google 製の機械学習フレームワーク
+- **Firestore**: Firebase のリアルタイムデータベース
+- **Lottie**: Adobe After Effects アニメーションを表示するライブラリ
+
+### B. 参考リンク
+- Flutter: https://flutter.dev/
+- Firebase: https://firebase.google.com/
+- MediaPipe: https://mediapipe.dev/
