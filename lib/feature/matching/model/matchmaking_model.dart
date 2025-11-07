@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'matchmaking_model.freezed.dart';
@@ -16,15 +15,4 @@ abstract class MatchmakingModel with _$MatchmakingModel {
 
   factory MatchmakingModel.fromJson(Map<String, dynamic> json) =>
       _$MatchmakingModelFromJson(json);
-}
-
-DateTime _timestampFromJson(dynamic timestamp) {
-  if (timestamp is Timestamp) {
-    return timestamp.toDate();
-  }
-  return DateTime.now();
-}
-
-dynamic _timestampToJson(DateTime dateTime) {
-  return Timestamp.fromDate(dateTime);
 }

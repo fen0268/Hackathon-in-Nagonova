@@ -49,4 +49,4 @@ final class MatchRepositoryProvider
   }
 }
 
-String _$matchRepositoryHash() => r'45ef54dc9d678cfe32920d733b72c7f824fd1685';
+String _$matchRepositoryHash() => r'274f58bb3c89058e33ff9db45fe2450207c34a17';

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'round_model.freezed.dart';
@@ -29,21 +28,4 @@ abstract class RoundModel with _$RoundModel {
 
   factory RoundModel.fromJson(Map<String, dynamic> json) =>
       _$RoundModelFromJson(json);
-}
-
-DateTime? _timestampFromJsonNullable(dynamic timestamp) {
-  if (timestamp == null) {
-    return null;
-  }
-  if (timestamp is Timestamp) {
-    return timestamp.toDate();
-  }
-  return null;
-}
-
-dynamic _timestampToJsonNullable(DateTime? dateTime) {
-  if (dateTime == null) {
-    return null;
-  }
-  return Timestamp.fromDate(dateTime);
 }

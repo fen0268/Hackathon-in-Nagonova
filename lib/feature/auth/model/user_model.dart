@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user_model.freezed.dart';
@@ -17,15 +16,4 @@ abstract class UserModel with _$UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
-}
-
-DateTime _timestampFromJson(dynamic timestamp) {
-  if (timestamp is Timestamp) {
-    return timestamp.toDate();
-  }
-  return DateTime.now();
-}
-
-dynamic _timestampToJson(DateTime dateTime) {
-  return Timestamp.fromDate(dateTime);
 }

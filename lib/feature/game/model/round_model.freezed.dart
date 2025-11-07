@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RoundModel {
 
- String? get player1ImageUrl; String? get player2ImageUrl; bool get player1ImageReady; bool get player2ImageReady;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get shootingAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get player1UploadedAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get player2UploadedAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get bothReadyAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get displayCountdownStartedAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get imagesDisplayedAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get player1SmileDetectedAt;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get player2SmileDetectedAt; String? get winner;@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? get roundEndedAt; double? get player1UploadTime; double? get player2UploadTime; double? get player1ReactionTime; double? get player2ReactionTime;
+ String? get player1ImageUrl; String? get player2ImageUrl; bool get player1ImageReady; bool get player2ImageReady; DateTime? get shootingAt; DateTime? get player1UploadedAt; DateTime? get player2UploadedAt; DateTime? get bothReadyAt; DateTime? get displayCountdownStartedAt; DateTime? get imagesDisplayedAt; DateTime? get player1SmileDetectedAt; DateTime? get player2SmileDetectedAt; String? get winner; DateTime? get roundEndedAt; double? get player1UploadTime; double? get player2UploadTime; double? get player1ReactionTime; double? get player2ReactionTime;
 /// Create a copy of RoundModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $RoundModelCopyWith<$Res>  {
   factory $RoundModelCopyWith(RoundModel value, $Res Function(RoundModel) _then) = _$RoundModelCopyWithImpl;
 @useResult
 $Res call({
- String? player1ImageUrl, String? player2ImageUrl, bool player1ImageReady, bool player2ImageReady,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? shootingAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player1UploadedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player2UploadedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? bothReadyAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? displayCountdownStartedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? imagesDisplayedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player1SmileDetectedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player2SmileDetectedAt, String? winner,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? roundEndedAt, double? player1UploadTime, double? player2UploadTime, double? player1ReactionTime, double? player2ReactionTime
+ String? player1ImageUrl, String? player2ImageUrl, bool player1ImageReady, bool player2ImageReady, DateTime? shootingAt, DateTime? player1UploadedAt, DateTime? player2UploadedAt, DateTime? bothReadyAt, DateTime? displayCountdownStartedAt, DateTime? imagesDisplayedAt, DateTime? player1SmileDetectedAt, DateTime? player2SmileDetectedAt, String? winner, DateTime? roundEndedAt, double? player1UploadTime, double? player2UploadTime, double? player1ReactionTime, double? player2ReactionTime
 });
 
 
@@ -170,7 +170,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? player1ImageUrl,  String? player2ImageUrl,  bool player1ImageReady,  bool player2ImageReady, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? shootingAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player1UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player2UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? bothReadyAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? displayCountdownStartedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? imagesDisplayedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player1SmileDetectedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player2SmileDetectedAt,  String? winner, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? roundEndedAt,  double? player1UploadTime,  double? player2UploadTime,  double? player1ReactionTime,  double? player2ReactionTime)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? player1ImageUrl,  String? player2ImageUrl,  bool player1ImageReady,  bool player2ImageReady,  DateTime? shootingAt,  DateTime? player1UploadedAt,  DateTime? player2UploadedAt,  DateTime? bothReadyAt,  DateTime? displayCountdownStartedAt,  DateTime? imagesDisplayedAt,  DateTime? player1SmileDetectedAt,  DateTime? player2SmileDetectedAt,  String? winner,  DateTime? roundEndedAt,  double? player1UploadTime,  double? player2UploadTime,  double? player1ReactionTime,  double? player2ReactionTime)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RoundModel() when $default != null:
 return $default(_that.player1ImageUrl,_that.player2ImageUrl,_that.player1ImageReady,_that.player2ImageReady,_that.shootingAt,_that.player1UploadedAt,_that.player2UploadedAt,_that.bothReadyAt,_that.displayCountdownStartedAt,_that.imagesDisplayedAt,_that.player1SmileDetectedAt,_that.player2SmileDetectedAt,_that.winner,_that.roundEndedAt,_that.player1UploadTime,_that.player2UploadTime,_that.player1ReactionTime,_that.player2ReactionTime);case _:
@@ -191,7 +191,7 @@ return $default(_that.player1ImageUrl,_that.player2ImageUrl,_that.player1ImageRe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? player1ImageUrl,  String? player2ImageUrl,  bool player1ImageReady,  bool player2ImageReady, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? shootingAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player1UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player2UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? bothReadyAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? displayCountdownStartedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? imagesDisplayedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player1SmileDetectedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player2SmileDetectedAt,  String? winner, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? roundEndedAt,  double? player1UploadTime,  double? player2UploadTime,  double? player1ReactionTime,  double? player2ReactionTime)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? player1ImageUrl,  String? player2ImageUrl,  bool player1ImageReady,  bool player2ImageReady,  DateTime? shootingAt,  DateTime? player1UploadedAt,  DateTime? player2UploadedAt,  DateTime? bothReadyAt,  DateTime? displayCountdownStartedAt,  DateTime? imagesDisplayedAt,  DateTime? player1SmileDetectedAt,  DateTime? player2SmileDetectedAt,  String? winner,  DateTime? roundEndedAt,  double? player1UploadTime,  double? player2UploadTime,  double? player1ReactionTime,  double? player2ReactionTime)  $default,) {final _that = this;
 switch (_that) {
 case _RoundModel():
 return $default(_that.player1ImageUrl,_that.player2ImageUrl,_that.player1ImageReady,_that.player2ImageReady,_that.shootingAt,_that.player1UploadedAt,_that.player2UploadedAt,_that.bothReadyAt,_that.displayCountdownStartedAt,_that.imagesDisplayedAt,_that.player1SmileDetectedAt,_that.player2SmileDetectedAt,_that.winner,_that.roundEndedAt,_that.player1UploadTime,_that.player2UploadTime,_that.player1ReactionTime,_that.player2ReactionTime);case _:
@@ -211,7 +211,7 @@ return $default(_that.player1ImageUrl,_that.player2ImageUrl,_that.player1ImageRe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? player1ImageUrl,  String? player2ImageUrl,  bool player1ImageReady,  bool player2ImageReady, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? shootingAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player1UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player2UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? bothReadyAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? displayCountdownStartedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? imagesDisplayedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player1SmileDetectedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? player2SmileDetectedAt,  String? winner, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable)  DateTime? roundEndedAt,  double? player1UploadTime,  double? player2UploadTime,  double? player1ReactionTime,  double? player2ReactionTime)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? player1ImageUrl,  String? player2ImageUrl,  bool player1ImageReady,  bool player2ImageReady,  DateTime? shootingAt,  DateTime? player1UploadedAt,  DateTime? player2UploadedAt,  DateTime? bothReadyAt,  DateTime? displayCountdownStartedAt,  DateTime? imagesDisplayedAt,  DateTime? player1SmileDetectedAt,  DateTime? player2SmileDetectedAt,  String? winner,  DateTime? roundEndedAt,  double? player1UploadTime,  double? player2UploadTime,  double? player1ReactionTime,  double? player2ReactionTime)?  $default,) {final _that = this;
 switch (_that) {
 case _RoundModel() when $default != null:
 return $default(_that.player1ImageUrl,_that.player2ImageUrl,_that.player1ImageReady,_that.player2ImageReady,_that.shootingAt,_that.player1UploadedAt,_that.player2UploadedAt,_that.bothReadyAt,_that.displayCountdownStartedAt,_that.imagesDisplayedAt,_that.player1SmileDetectedAt,_that.player2SmileDetectedAt,_that.winner,_that.roundEndedAt,_that.player1UploadTime,_that.player2UploadTime,_that.player1ReactionTime,_that.player2ReactionTime);case _:
@@ -226,23 +226,23 @@ return $default(_that.player1ImageUrl,_that.player2ImageUrl,_that.player1ImageRe
 @JsonSerializable()
 
 class _RoundModel implements RoundModel {
-  const _RoundModel({this.player1ImageUrl, this.player2ImageUrl, this.player1ImageReady = false, this.player2ImageReady = false, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.shootingAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.player1UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.player2UploadedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.bothReadyAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.displayCountdownStartedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.imagesDisplayedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.player1SmileDetectedAt, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.player2SmileDetectedAt, this.winner, @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) this.roundEndedAt, this.player1UploadTime, this.player2UploadTime, this.player1ReactionTime, this.player2ReactionTime});
+  const _RoundModel({this.player1ImageUrl, this.player2ImageUrl, this.player1ImageReady = false, this.player2ImageReady = false, this.shootingAt, this.player1UploadedAt, this.player2UploadedAt, this.bothReadyAt, this.displayCountdownStartedAt, this.imagesDisplayedAt, this.player1SmileDetectedAt, this.player2SmileDetectedAt, this.winner, this.roundEndedAt, this.player1UploadTime, this.player2UploadTime, this.player1ReactionTime, this.player2ReactionTime});
   factory _RoundModel.fromJson(Map<String, dynamic> json) => _$RoundModelFromJson(json);
 
 @override final  String? player1ImageUrl;
 @override final  String? player2ImageUrl;
 @override@JsonKey() final  bool player1ImageReady;
 @override@JsonKey() final  bool player2ImageReady;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? shootingAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? player1UploadedAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? player2UploadedAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? bothReadyAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? displayCountdownStartedAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? imagesDisplayedAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? player1SmileDetectedAt;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? player2SmileDetectedAt;
+@override final  DateTime? shootingAt;
+@override final  DateTime? player1UploadedAt;
+@override final  DateTime? player2UploadedAt;
+@override final  DateTime? bothReadyAt;
+@override final  DateTime? displayCountdownStartedAt;
+@override final  DateTime? imagesDisplayedAt;
+@override final  DateTime? player1SmileDetectedAt;
+@override final  DateTime? player2SmileDetectedAt;
 @override final  String? winner;
-@override@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) final  DateTime? roundEndedAt;
+@override final  DateTime? roundEndedAt;
 @override final  double? player1UploadTime;
 @override final  double? player2UploadTime;
 @override final  double? player1ReactionTime;
@@ -281,7 +281,7 @@ abstract mixin class _$RoundModelCopyWith<$Res> implements $RoundModelCopyWith<$
   factory _$RoundModelCopyWith(_RoundModel value, $Res Function(_RoundModel) _then) = __$RoundModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? player1ImageUrl, String? player2ImageUrl, bool player1ImageReady, bool player2ImageReady,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? shootingAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player1UploadedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player2UploadedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? bothReadyAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? displayCountdownStartedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? imagesDisplayedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player1SmileDetectedAt,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? player2SmileDetectedAt, String? winner,@JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? roundEndedAt, double? player1UploadTime, double? player2UploadTime, double? player1ReactionTime, double? player2ReactionTime
+ String? player1ImageUrl, String? player2ImageUrl, bool player1ImageReady, bool player2ImageReady, DateTime? shootingAt, DateTime? player1UploadedAt, DateTime? player2UploadedAt, DateTime? bothReadyAt, DateTime? displayCountdownStartedAt, DateTime? imagesDisplayedAt, DateTime? player1SmileDetectedAt, DateTime? player2SmileDetectedAt, String? winner, DateTime? roundEndedAt, double? player1UploadTime, double? player2UploadTime, double? player1ReactionTime, double? player2ReactionTime
 });
 
 

@@ -13,7 +13,7 @@ _RankingModel _$RankingModelFromJson(Map<String, dynamic> json) =>
       totalMatches: (json['totalMatches'] as num?)?.toInt() ?? 0,
       wins: (json['wins'] as num?)?.toInt() ?? 0,
       winRate: (json['winRate'] as num?)?.toDouble() ?? 0.0,
-      updatedAt: _timestampFromJson(json['updatedAt']),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
 Map<String, dynamic> _$RankingModelToJson(_RankingModel instance) =>
@@ -23,5 +23,5 @@ Map<String, dynamic> _$RankingModelToJson(_RankingModel instance) =>
       'totalMatches': instance.totalMatches,
       'wins': instance.wins,
       'winRate': instance.winRate,
-      'updatedAt': _timestampToJson(instance.updatedAt),
+      'updatedAt': instance.updatedAt.toIso8601String(),
     };

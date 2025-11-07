@@ -54,7 +54,7 @@ final class FirebaseFirestoreProvider
   }
 }
 
-String _$firebaseFirestoreHash() => r'230b9276da2e44bb1aa6b300e1ddbb2f93c422da';
+String _$firebaseFirestoreHash() => r'963402713bf9b7cc1fb259d619d9b0184d4dcec1';
 
 @ProviderFor(userRepository)
 const userRepositoryProvider = UserRepositoryProvider._();
@@ -95,4 +95,4 @@ final class UserRepositoryProvider
   }
 }
 
-String _$userRepositoryHash() => r'e03ed66683935a93f85907954aa11f5e9ddaf2b6';
+String _$userRepositoryHash() => r'3e800392fca7674e90661cce096108eb87ea4a52';

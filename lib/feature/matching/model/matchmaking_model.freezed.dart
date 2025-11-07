@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MatchmakingModel {
 
- String get userId; String get status;@JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) DateTime get createdAt; String? get matchedWith; String? get matchId;
+ String get userId; String get status; DateTime get createdAt; String? get matchedWith; String? get matchId;
 /// Create a copy of MatchmakingModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $MatchmakingModelCopyWith<$Res>  {
   factory $MatchmakingModelCopyWith(MatchmakingModel value, $Res Function(MatchmakingModel) _then) = _$MatchmakingModelCopyWithImpl;
 @useResult
 $Res call({
- String userId, String status,@JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) DateTime createdAt, String? matchedWith, String? matchId
+ String userId, String status, DateTime createdAt, String? matchedWith, String? matchId
 });
 
 
@@ -157,7 +157,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String status, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)  DateTime createdAt,  String? matchedWith,  String? matchId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String status,  DateTime createdAt,  String? matchedWith,  String? matchId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MatchmakingModel() when $default != null:
 return $default(_that.userId,_that.status,_that.createdAt,_that.matchedWith,_that.matchId);case _:
@@ -178,7 +178,7 @@ return $default(_that.userId,_that.status,_that.createdAt,_that.matchedWith,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String status, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)  DateTime createdAt,  String? matchedWith,  String? matchId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String status,  DateTime createdAt,  String? matchedWith,  String? matchId)  $default,) {final _that = this;
 switch (_that) {
 case _MatchmakingModel():
 return $default(_that.userId,_that.status,_that.createdAt,_that.matchedWith,_that.matchId);case _:
@@ -198,7 +198,7 @@ return $default(_that.userId,_that.status,_that.createdAt,_that.matchedWith,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String status, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)  DateTime createdAt,  String? matchedWith,  String? matchId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String status,  DateTime createdAt,  String? matchedWith,  String? matchId)?  $default,) {final _that = this;
 switch (_that) {
 case _MatchmakingModel() when $default != null:
 return $default(_that.userId,_that.status,_that.createdAt,_that.matchedWith,_that.matchId);case _:
@@ -213,12 +213,12 @@ return $default(_that.userId,_that.status,_that.createdAt,_that.matchedWith,_tha
 @JsonSerializable()
 
 class _MatchmakingModel implements MatchmakingModel {
-  const _MatchmakingModel({required this.userId, this.status = 'waiting', @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required this.createdAt, this.matchedWith, this.matchId});
+  const _MatchmakingModel({required this.userId, this.status = 'waiting', required this.createdAt, this.matchedWith, this.matchId});
   factory _MatchmakingModel.fromJson(Map<String, dynamic> json) => _$MatchmakingModelFromJson(json);
 
 @override final  String userId;
 @override@JsonKey() final  String status;
-@override@JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) final  DateTime createdAt;
+@override final  DateTime createdAt;
 @override final  String? matchedWith;
 @override final  String? matchId;
 
@@ -255,7 +255,7 @@ abstract mixin class _$MatchmakingModelCopyWith<$Res> implements $MatchmakingMod
   factory _$MatchmakingModelCopyWith(_MatchmakingModel value, $Res Function(_MatchmakingModel) _then) = __$MatchmakingModelCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String status,@JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) DateTime createdAt, String? matchedWith, String? matchId
+ String userId, String status, DateTime createdAt, String? matchedWith, String? matchId
 });
 
 

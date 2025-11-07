@@ -54,4 +54,4 @@ final class RankingRepositoryProvider
   }
 }
 
-String _$rankingRepositoryHash() => r'3885abafa49603a659f67dfddc389d8f9e39d245';
+String _$rankingRepositoryHash() => r'b39cc6b31326f5b12baa313baa960678be008cd1';

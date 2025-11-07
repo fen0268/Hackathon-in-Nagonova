@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hackathon_app/feature/game/model/round_model.dart';
 
@@ -23,32 +22,4 @@ abstract class MatchModel with _$MatchModel {
 
   factory MatchModel.fromJson(Map<String, dynamic> json) =>
       _$MatchModelFromJson(json);
-}
-
-DateTime _timestampFromJson(dynamic timestamp) {
-  if (timestamp is Timestamp) {
-    return timestamp.toDate();
-  }
-  return DateTime.now();
-}
-
-dynamic _timestampToJson(DateTime dateTime) {
-  return Timestamp.fromDate(dateTime);
-}
-
-DateTime? _timestampFromJsonNullable(dynamic timestamp) {
-  if (timestamp == null) {
-    return null;
-  }
-  if (timestamp is Timestamp) {
-    return timestamp.toDate();
-  }
-  return null;
-}
-
-dynamic _timestampToJsonNullable(DateTime? dateTime) {
-  if (dateTime == null) {
-    return null;
-  }
-  return Timestamp.fromDate(dateTime);
 }

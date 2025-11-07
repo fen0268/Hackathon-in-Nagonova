@@ -11,8 +11,10 @@ _MatchModel _$MatchModelFromJson(Map<String, dynamic> json) => _MatchModel(
   player1: json['player1'] as String,
   player2: json['player2'] as String,
   status: json['status'] as String? ?? 'waiting',
-  startedAt: _timestampFromJson(json['startedAt']),
-  finishedAt: _timestampFromJsonNullable(json['finishedAt']),
+  startedAt: DateTime.parse(json['startedAt'] as String),
+  finishedAt: json['finishedAt'] == null
+      ? null
+      : DateTime.parse(json['finishedAt'] as String),
   currentRound: (json['currentRound'] as num?)?.toInt() ?? 1,
   round1: json['round1'] == null
       ? null
@@ -21,7 +23,7 @@ _MatchModel _$MatchModelFromJson(Map<String, dynamic> json) => _MatchModel(
       ? null
       : RoundModel.fromJson(json['round2'] as Map<String, dynamic>),
   finalWinner: json['finalWinner'] as String?,
-  createdAt: _timestampFromJson(json['createdAt']),
+  createdAt: DateTime.parse(json['createdAt'] as String),
 );
 
 Map<String, dynamic> _$MatchModelToJson(_MatchModel instance) =>
@@ -30,11 +32,11 @@ Map<String, dynamic> _$MatchModelToJson(_MatchModel instance) =>
       'player1': instance.player1,
       'player2': instance.player2,
       'status': instance.status,
-      'startedAt': _timestampToJson(instance.startedAt),
-      'finishedAt': _timestampToJsonNullable(instance.finishedAt),
+      'startedAt': instance.startedAt.toIso8601String(),
+      'finishedAt': instance.finishedAt?.toIso8601String(),
       'currentRound': instance.currentRound,
       'round1': instance.round1,
       'round2': instance.round2,
       'finalWinner': instance.finalWinner,
-      'createdAt': _timestampToJson(instance.createdAt),
+      'createdAt': instance.createdAt.toIso8601String(),
     };

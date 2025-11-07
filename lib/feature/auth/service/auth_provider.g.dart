@@ -135,7 +135,7 @@ final class AuthStateProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$authStateHash() => r'f31fa30127ecb0f69c1f8712f42363215d06d31f';
+String _$authStateHash() => r'05670f7599da7d5fac1a52487c7f76558894caf2';
 
 /// ニックネームが登録済みかどうかを返すProvider
 
@@ -173,4 +173,4 @@ final class HasNicknameProvider
   }
 }
 
-String _$hasNicknameHash() => r'63d9ef0ffcc7b654d84b24b92c8d6717145f8342';
+String _$hasNicknameHash() => r'5b6c960cf910652fb6f85b709aa1d2b135f9d0b5';

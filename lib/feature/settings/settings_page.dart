@@ -31,8 +31,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   title: const Text('ニックネーム変更'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    final snackBar = ref.read(snackBarServiceProvider);
-                    snackBar.showInfo(context, '実装予定');
+                    ref.read(snackBarServiceProvider).showInfo(context, '実装予定');
                   },
                 ),
               ],
