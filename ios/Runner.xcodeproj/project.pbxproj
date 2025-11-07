@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C658DFA2EBE757B003E7857 /* NativeCameraViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C658DF92EBE757B003E7857 /* NativeCameraViewFactory.swift */; };
 		0CB1D63F2EBE3C6700D42371 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0CB1D63D2EBE3C6600D42371 /* README.md */; };
 		0CB1D6412EBE3C7300D42371 /* NativeCameraHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB1D6402EBE3C7300D42371 /* NativeCameraHandler.swift */; };
 		0CB1D6432EBE3C7F00D42371 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0CB1D6422EBE3C7F00D42371 /* GoogleService-Info.plist */; };
@@ -49,6 +50,7 @@
 
 /* Begin PBXFileReference section */
 		0906926C09DDEA3B969A396F /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0C658DF92EBE757B003E7857 /* NativeCameraViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCameraViewFactory.swift; sourceTree = "<group>"; };
 		0CB1D63D2EBE3C6600D42371 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0CB1D6402EBE3C7300D42371 /* NativeCameraHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCameraHandler.swift; sourceTree = "<group>"; };
 		0CB1D6422EBE3C7F00D42371 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				0C658DF92EBE757B003E7857 /* NativeCameraViewFactory.swift */,
 				0CB1D6482EBE3C9300D42371 /* Base.lproj */,
 				0CB1D6422EBE3C7F00D42371 /* GoogleService-Info.plist */,
 				0CB1D6402EBE3C7300D42371 /* NativeCameraHandler.swift */,
@@ -418,6 +421,7 @@
 				0CB1D6412EBE3C7300D42371 /* NativeCameraHandler.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				0C658DFA2EBE757B003E7857 /* NativeCameraViewFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

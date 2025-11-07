@@ -13,6 +13,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private val CAMERA_CHANNEL = "com.example.hackathon_app/camera"
     private val CAMERA_EVENTS_CHANNEL = "com.example.hackathon_app/camera_events"
+    private val CAMERA_VIEW_TYPE = "com.example.hackathon_app/camera_view"
     private val CAMERA_PERMISSION_REQUEST_CODE = 100
 
     private var methodChannel: MethodChannel? = null
@@ -21,6 +22,21 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        // Event Channel のセットアップ（先に作成）
+        eventChannel = EventChannel(flutterEngine.dartExecutor.binaryMessenger, CAMERA_EVENTS_CHANNEL)
+
+        // NativeCameraHandler の初期化
+        nativeCameraHandler = NativeCameraHandler(this, eventChannel!!)
+
+        // Platform View の登録
+        flutterEngine
+            .platformViewsController
+            .registry
+            .registerViewFactory(
+                CAMERA_VIEW_TYPE,
+                NativeCameraViewFactory(nativeCameraHandler!!)
+            )
 
         // Method Channel のセットアップ
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CAMERA_CHANNEL)
@@ -53,18 +69,14 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
-
-        // Event Channel のセットアップ
-        eventChannel = EventChannel(flutterEngine.dartExecutor.binaryMessenger, CAMERA_EVENTS_CHANNEL)
-
-        // NativeCameraHandler の初期化
-        nativeCameraHandler = NativeCameraHandler(this, eventChannel!!)
     }
 
     private fun startCamera(countdownSeconds: Int, result: MethodChannel.Result) {
         if (checkCameraPermission()) {
-            nativeCameraHandler?.startCamera(countdownSeconds)
-            result.success(null)
+            nativeCameraHandler?.startCamera(countdownSeconds) {
+                // 撮影完了をFlutter側に返す
+                result.success(null)
+            }
         } else {
             requestCameraPermission()
             result.error("PERMISSION_DENIED", "Camera permission not granted", null)

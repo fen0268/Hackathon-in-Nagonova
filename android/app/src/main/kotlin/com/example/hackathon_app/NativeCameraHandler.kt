@@ -3,14 +3,21 @@ package com.example.hackathon_app
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.ImageFormat
 import android.graphics.Matrix
 import android.media.Image
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.google.mediapipe.framework.image.BitmapImageBuilder
@@ -41,9 +48,18 @@ class NativeCameraHandler(
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var camera: Camera? = null
+    private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
     private var imageAnalysis: ImageAnalysis? = null
     private var cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+
+    private var previewView: PreviewView? = null
+    private var cameraPreviewContainer: FrameLayout? = null
+
+    // カウントダウン UI
+    private var countdownTextView: TextView? = null
+    private var countdownJob: Job? = null
+    private var currentCountdown = 5
 
     private var faceLandmarker: FaceLandmarker? = null
     private var isSmileDetectionActive = false
@@ -53,6 +69,7 @@ class NativeCameraHandler(
 
     private var capturedImagePath: String? = null
     private var capturedImageData: ByteArray? = null
+    private var onCaptureCompleted: (() -> Unit)? = null
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -60,6 +77,10 @@ class NativeCameraHandler(
     init {
         eventChannel.setStreamHandler(this)
         initializeMediaPipe()
+    }
+
+    fun setCameraPreviewContainer(container: FrameLayout) {
+        this.cameraPreviewContainer = container
     }
 
     // EventChannel.StreamHandler の実装
@@ -94,7 +115,10 @@ class NativeCameraHandler(
         }
     }
 
-    fun startCamera(countdownSeconds: Int) {
+    fun startCamera(countdownSeconds: Int, onCaptureCompleted: () -> Unit) {
+        currentCountdown = countdownSeconds
+        this.onCaptureCompleted = onCaptureCompleted
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
         cameraProviderFuture.addListener({
@@ -103,22 +127,39 @@ class NativeCameraHandler(
             // カメラ起動
             bindCameraUseCases()
 
-            // カウントダウン後に撮影
-            scope.launch {
-                delay((countdownSeconds * 1000).toLong())
-                captureImage()
-            }
+            // カウントダウンUIを表示
+            showCountdownUI()
+            startCountdownTimer()
         }, ContextCompat.getMainExecutor(context))
     }
 
     private fun bindCameraUseCases() {
         val cameraProvider = cameraProvider ?: return
+        val container = cameraPreviewContainer ?: return
 
         // 既存のバインドを解除
         cameraProvider.unbindAll()
 
+        // PreviewViewを作成してコンテナに追加
+        if (previewView == null) {
+            previewView = PreviewView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            }
+            container.addView(previewView, 0)
+        }
+
         // カメラセレクター（フロントカメラ）
         val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+
+        // Preview（プレビュー用）
+        preview = Preview.Builder()
+            .build()
+            .also {
+                it.setSurfaceProvider(previewView?.surfaceProvider)
+            }
 
         // ImageCapture（撮影用）
         imageCapture = ImageCapture.Builder()
@@ -143,12 +184,92 @@ class NativeCameraHandler(
             camera = cameraProvider.bindToLifecycle(
                 context as LifecycleOwner,
                 cameraSelector,
+                preview,
                 imageCapture,
                 imageAnalysis
             )
             Log.d(TAG, "Camera bound successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to bind camera", e)
+        }
+    }
+
+    // カウントダウンUIを表示
+    private fun showCountdownUI() {
+        val container = cameraPreviewContainer ?: return
+
+        mainHandler.post {
+            // 既存のカウントダウンビューを削除
+            countdownTextView?.let { container.removeView(it.parent as? View) }
+
+            // カウントダウンテキストビューを作成
+            countdownTextView = TextView(context).apply {
+                text = currentCountdown.toString()
+                textSize = 120f
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+            }
+
+            // 背景ビュー
+            val backgroundView = FrameLayout(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    (200 * context.resources.displayMetrics.density).toInt(),
+                    (200 * context.resources.displayMetrics.density).toInt()
+                ).apply {
+                    gravity = Gravity.CENTER
+                }
+                setBackgroundColor(Color.argb(128, 0, 0, 0))
+            }
+
+            backgroundView.addView(countdownTextView, FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            ))
+
+            container.addView(backgroundView)
+        }
+    }
+
+    // カウントダウンタイマーを開始
+    private fun startCountdownTimer() {
+        countdownJob?.cancel()
+        countdownJob = scope.launch {
+            while (currentCountdown > 0) {
+                delay(1000)
+                currentCountdown--
+                updateCountdownUI()
+            }
+            hideCountdownUI()
+            captureImage()
+        }
+    }
+
+    // カウントダウンUIを更新
+    private fun updateCountdownUI() {
+        mainHandler.post {
+            countdownTextView?.text = currentCountdown.toString()
+
+            // カウントダウンに応じて色を変化
+            val color = when (currentCountdown) {
+                5, 4 -> Color.GREEN
+                3 -> Color.YELLOW
+                2 -> Color.rgb(255, 165, 0) // Orange
+                1 -> Color.RED
+                else -> Color.WHITE
+            }
+
+            countdownTextView?.setTextColor(color)
+        }
+    }
+
+    // カウントダウンUIを非表示
+    private fun hideCountdownUI() {
+        mainHandler.post {
+            countdownTextView?.let { textView ->
+                val parent = textView.parent as? ViewGroup
+                parent?.let { cameraPreviewContainer?.removeView(it) }
+            }
+            countdownTextView = null
         }
     }
 
@@ -175,12 +296,15 @@ class NativeCameraHandler(
 
                     Log.d(TAG, "Image captured: ${photoFile.absolutePath}")
 
-                    // Flutter側に通知（必要に応じて）
-                    // methodChannel?.invokeMethod("onCaptureCompleted", photoFile.absolutePath)
+                    // 撮影完了をFlutter側に通知
+                    onCaptureCompleted?.invoke()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     Log.e(TAG, "Image capture failed", exception)
+
+                    // エラーでも通知
+                    onCaptureCompleted?.invoke()
                 }
             }
         )
@@ -276,6 +400,20 @@ class NativeCameraHandler(
     }
 
     fun stopCamera() {
+        countdownJob?.cancel()
+        countdownJob = null
+
+        mainHandler.post {
+            countdownTextView?.let { textView ->
+                val parent = textView.parent as? ViewGroup
+                parent?.let { cameraPreviewContainer?.removeView(it) }
+            }
+            countdownTextView = null
+
+            previewView?.let { cameraPreviewContainer?.removeView(it) }
+            previewView = null
+        }
+
         cameraProvider?.unbindAll()
         isSmileDetectionActive = false
         Log.d(TAG, "Camera stopped")

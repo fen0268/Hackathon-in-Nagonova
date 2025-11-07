@@ -5,6 +5,7 @@ import UIKit
 @objc class AppDelegate: FlutterAppDelegate {
     private let CAMERA_CHANNEL = "com.example.hackathon_app/camera"
     private let CAMERA_EVENTS_CHANNEL = "com.example.hackathon_app/camera_events"
+    private let CAMERA_VIEW_TYPE = "com.example.hackathon_app/camera_view"
 
     private var nativeCameraHandler: NativeCameraHandler?
 
@@ -36,6 +37,11 @@ import UIKit
             eventChannel: eventChannel
         )
 
+        // Platform View の登録
+        let registrar = self.registrar(forPlugin: "NativeCameraViewPlugin")
+        let factory = NativeCameraViewFactory(handler: nativeCameraHandler!)
+        registrar?.register(factory, withId: CAMERA_VIEW_TYPE)
+
         // Method Channel ハンドラー
         methodChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
             guard let self = self else { return }
@@ -44,8 +50,10 @@ import UIKit
             case "startCamera":
                 if let args = call.arguments as? [String: Any],
                    let countdownSeconds = args["countdownSeconds"] as? Int {
-                    self.nativeCameraHandler?.startCamera(countdownSeconds: countdownSeconds)
-                    result(nil)
+                    self.nativeCameraHandler?.startCamera(countdownSeconds: countdownSeconds) {
+                        // 撮影完了をFlutter側に返す
+                        result(nil)
+                    }
                 } else {
                     result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid arguments", details: nil))
                 }
