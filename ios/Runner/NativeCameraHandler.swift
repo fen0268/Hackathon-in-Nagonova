@@ -4,8 +4,8 @@ import UIKit
 import MediaPipeTasksVision
 
 class NativeCameraHandler: NSObject {
-    private static let SMILE_THRESHOLD: Float = 0.7
-    private static let CONSECUTIVE_FRAMES_REQUIRED = 3
+    private static let SMILE_THRESHOLD: Float = 0.5
+    private static let CONSECUTIVE_FRAMES_REQUIRED = 2
     private static let TARGET_FPS = 20
     private static let FRAME_INTERVAL: TimeInterval = 1.0 / Double(TARGET_FPS)
 

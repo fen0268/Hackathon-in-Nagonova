@@ -191,8 +191,6 @@ class _ResultPageState extends ConsumerState<ResultPage> {
 
   /// 対戦統計情報
   Widget _buildMatchStats(MatchModel match, bool isPlayer1) {
-    final playerUploadTime = isPlayer1 ? match.player1UploadTime : match.player2UploadTime;
-    final opponentUploadTime = isPlayer1 ? match.player2UploadTime : match.player1UploadTime;
     final playerReactionTime = isPlayer1 ? match.player1ReactionTime : match.player2ReactionTime;
     final opponentReactionTime = isPlayer1 ? match.player2ReactionTime : match.player1ReactionTime;
 
@@ -215,8 +213,6 @@ class _ResultPageState extends ConsumerState<ResultPage> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildStatRow('アップロード時間', playerUploadTime, opponentUploadTime),
-          const SizedBox(height: 12),
           _buildStatRow('反応時間', playerReactionTime, opponentReactionTime),
         ],
       ),

@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hackathon_app/feature/auth/model/user_model.dart';
+import 'package:hackathon_app/feature/auth/service/auth_provider.dart';
+import 'package:hackathon_app/feature/auth/service/user_repository.dart';
 
 import '../matching/matching_page.dart';
 import '../ranking/ranking_page.dart';
 import '../settings/settings_page.dart';
+
+/// 現在のユーザー情報を取得するプロバイダー
+final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) {
+  final currentUser = ref.watch(authStateChangesProvider).value;
+  final userId = currentUser?.uid ?? '';
+
+  if (userId.isEmpty) {
+    return Future.value(null);
+  }
+
+  final userRepository = ref.watch(userRepositoryProvider);
+  return userRepository.getUser(userId);
+});
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -18,13 +34,27 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class HomePageState extends ConsumerState<HomePage> {
-  // TODO: Firebase から実際のユーザー統計情報を取得する
-  final int totalMatches = 0;
-  final int wins = 0;
-  double get winRate => totalMatches > 0 ? wins / totalMatches : 0.0;
-
   @override
   Widget build(BuildContext context) {
+    final userAsync = ref.watch(currentUserProvider);
+
+    return userAsync.when(
+      data: (user) => _buildHome(context, user),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(
+          child: Text('エラー: $error'),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHome(BuildContext context, UserModel? user) {
+    final totalMatches = user?.totalMatches ?? 0;
+    final wins = user?.wins ?? 0;
+    final winRate = user?.winRate ?? 0.0;
     return Scaffold(
       appBar: AppBar(
         title: const Text('にらめっこ'),

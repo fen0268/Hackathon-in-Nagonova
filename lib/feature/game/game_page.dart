@@ -177,6 +177,9 @@ class _GamePageState extends ConsumerState<GamePage> {
       case GamePhase.playing:
         return _buildPlayingView(gameState);
 
+      case GamePhase.waitingForResult:
+        return _buildWaitingForResultView(gameState);
+
       case GamePhase.finished:
         return _buildFinishedView();
     }
@@ -317,6 +320,36 @@ class _GamePageState extends ConsumerState<GamePage> {
           ),
         ),
       ],
+    );
+  }
+
+  /// 結果待機中の表示
+  Widget _buildWaitingForResultView(GameState gameState) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(color: Colors.white),
+          const SizedBox(height: 24),
+          const Text(
+            '対戦終了！\n相手の結果を待っています...',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'タイムアウトまで: ${gameState.resultWaitingTimeRemaining}秒',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

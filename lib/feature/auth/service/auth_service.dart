@@ -25,9 +25,11 @@ class AuthService {
     }
 
     await _firestore.collection('users').doc(user.uid).set({
+      'userId': user.uid,
       'nickname': nickname,
       'totalMatches': 0,
       'wins': 0,
+      'winRate': 0.0,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

@@ -26,16 +26,6 @@ class UserRepository {
     return UserModel.fromJson(doc.data()!);
   }
 
-  /// ユーザー情報をストリームで取得
-  Stream<UserModel?> watchUser(String userId) {
-    return _usersCollection.doc(userId).snapshots().map((doc) {
-      if (!doc.exists) {
-        return null;
-      }
-      return UserModel.fromJson(doc.data()!);
-    });
-  }
-
   /// ユーザー情報を更新
   Future<void> updateUser(String userId, Map<String, dynamic> data) async {
     await _usersCollection.doc(userId).update(data);

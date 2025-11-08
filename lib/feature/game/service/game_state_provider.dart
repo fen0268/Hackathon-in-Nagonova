@@ -3,10 +3,12 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hackathon_app/feature/auth/service/auth_provider.dart';
+import 'package:hackathon_app/feature/auth/service/user_repository.dart';
 import 'package:hackathon_app/feature/game/model/match_model.dart';
 import 'package:hackathon_app/feature/game/service/match_repository.dart';
 import 'package:hackathon_app/feature/game/service/native_camera_service.dart';
 import 'package:hackathon_app/feature/game/service/storage_service.dart';
+import 'package:hackathon_app/feature/ranking/service/ranking_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'game_state_provider.g.dart';
@@ -17,6 +19,7 @@ enum GamePhase {
   countdown, // カウントダウン
   preparing, // 準備中（アップロード待ち、5秒自動待機）
   playing, // 対戦中
+  waitingForResult, // 結果待機中（両者の準備完了を待つ）
   finished, // 終了
 }
 
@@ -27,10 +30,11 @@ class GameState {
     required this.match,
     required this.phase,
     this.countdown = 5,
-    this.playingTimeRemaining = 10,
+    this.playingTimeRemaining = 20,
     this.isPlayerSmiling = false,
     this.opponentImageUrl,
     this.preparingTimeRemaining = 5,
+    this.resultWaitingTimeRemaining = 10,
     this.error,
     this.isUploading = false,
   });
@@ -39,10 +43,11 @@ class GameState {
   final MatchModel match;
   final GamePhase phase;
   final int countdown; // 撮影前のカウントダウン（5秒）
-  final int playingTimeRemaining; // 対戦中の残り時間（10秒）
+  final int playingTimeRemaining; // 対戦中の残り時間（20秒）
   final bool isPlayerSmiling; // プレイヤーが笑顔かどうか
   final String? opponentImageUrl; // 相手の画像URL
   final int preparingTimeRemaining; // 準備中の残り時間（5秒自動待機）
+  final int resultWaitingTimeRemaining; // 結果待機の残り時間（10秒）
   final String? error;
   final bool isUploading; // 画像アップロード中かどうか
 
@@ -55,6 +60,7 @@ class GameState {
     bool? isPlayerSmiling,
     String? opponentImageUrl,
     int? preparingTimeRemaining,
+    int? resultWaitingTimeRemaining,
     String? error,
     bool? isUploading,
   }) {
@@ -68,6 +74,8 @@ class GameState {
       opponentImageUrl: opponentImageUrl ?? this.opponentImageUrl,
       preparingTimeRemaining:
           preparingTimeRemaining ?? this.preparingTimeRemaining,
+      resultWaitingTimeRemaining:
+          resultWaitingTimeRemaining ?? this.resultWaitingTimeRemaining,
       error: error ?? this.error,
       isUploading: isUploading ?? this.isUploading,
     );
@@ -83,6 +91,8 @@ class GameStateNotifier extends _$GameStateNotifier {
   MatchRepository? _matchRepository;
   StorageService? _storageService;
   NativeCameraService? _cameraService;
+  UserRepository? _userRepository;
+  RankingRepository? _rankingRepository;
   String? _currentUserId;
   bool _initialized = false;
 
@@ -91,12 +101,15 @@ class GameStateNotifier extends _$GameStateNotifier {
   Timer? _displayCountdownTimer;
   Timer? _playingTimer;
   Timer? _preparingTimeoutTimer;
+  Timer? _resultWaitingTimer;
   StreamSubscription<SmileDetectionResult>? _smileSubscription;
 
   // Getterで非nullアクセスを保証
   MatchRepository get matchRepository => _matchRepository!;
   StorageService get storageService => _storageService!;
   NativeCameraService get cameraService => _cameraService!;
+  UserRepository get userRepository => _userRepository!;
+  RankingRepository get rankingRepository => _rankingRepository!;
   String get currentUserId => _currentUserId!;
 
   @override
@@ -107,6 +120,8 @@ class GameStateNotifier extends _$GameStateNotifier {
       _matchRepository = ref.watch(matchRepositoryProvider);
       _storageService = ref.watch(storageServiceProvider);
       _cameraService = NativeCameraService();
+      _userRepository = ref.watch(userRepositoryProvider);
+      _rankingRepository = ref.watch(rankingRepositoryProvider);
       _currentUserId = ref.watch(authStateChangesProvider).value?.uid ?? '';
 
       // クリーンアップ
@@ -409,7 +424,7 @@ class GameStateNotifier extends _$GameStateNotifier {
     // 対戦中フェーズへ
     state = currentState.copyWith(
       phase: GamePhase.playing,
-      playingTimeRemaining: 10,
+      playingTimeRemaining: 20,
     );
 
     await matchRepository.updateMatchStatus(
@@ -441,7 +456,7 @@ class GameStateNotifier extends _$GameStateNotifier {
       },
     );
 
-    // 対戦タイマー（10秒）
+    // 対戦タイマー（20秒）
     _playingTimer?.cancel();
     _playingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final current = state;
@@ -496,12 +511,12 @@ class GameStateNotifier extends _$GameStateNotifier {
     await _finishGame(winner);
   }
 
-  /// 対戦タイムアウト（10秒経過 → 引き分け）
+  /// 対戦タイムアウト（20秒経過 → 引き分け）
   Future<void> _onPlayingTimeout() async {
     _smileSubscription?.cancel();
     await cameraService.stopSmileDetection();
 
-    // 10秒経過しても笑わず → 引き分け
+    // 20秒経過しても笑わず → 引き分け
     await _finishGame('draw');
   }
 
@@ -509,8 +524,7 @@ class GameStateNotifier extends _$GameStateNotifier {
   Future<void> _finishGame(String finalWinner) async {
     final currentState = state;
 
-    state = currentState.copyWith(phase: GamePhase.finished);
-
+    // マッチ結果を確定
     await matchRepository.finishMatch(
       matchId: currentState.matchId,
       winnerId: finalWinner,
@@ -523,6 +537,149 @@ class GameStateNotifier extends _$GameStateNotifier {
     _smileSubscription?.cancel();
 
     await cameraService.stopCamera();
+
+    // 対戦成績を更新
+    await _updateMatchStats(currentState.match, finalWinner);
+
+    // 自分が結果準備完了をマーク
+    await matchRepository.markPlayerReadyForResult(
+      matchId: currentState.matchId,
+      playerId: currentUserId,
+    );
+
+    // 結果待機フェーズに移行
+    state = currentState.copyWith(
+      phase: GamePhase.waitingForResult,
+      resultWaitingTimeRemaining: 10,
+    );
+
+    // 両者準備完了を監視 & 10秒タイムアウト
+    _startResultWaitingTimer();
+  }
+
+  /// 対戦成績とランキングを更新
+  Future<void> _updateMatchStats(MatchModel match, String winner) async {
+    try {
+      final player1Id = match.player1;
+      final player2Id = match.player2;
+
+      // 引き分けでない場合のみ勝者を判定
+      final isPlayer1Winner = winner == 'player1';
+      final isPlayer2Winner = winner == 'player2';
+
+      // player1の成績を更新
+      await userRepository.updateMatchStats(
+        userId: player1Id,
+        won: isPlayer1Winner,
+      );
+
+      // player2の成績を更新
+      await userRepository.updateMatchStats(
+        userId: player2Id,
+        won: isPlayer2Winner,
+      );
+
+      // ランキング情報を更新（両プレイヤー）
+      await _updateRankingForUser(player1Id);
+      await _updateRankingForUser(player2Id);
+    } catch (e) {
+      print('[GameState] 対戦成績の更新エラー: $e');
+      // エラーが発生しても続行（ゲーム結果は保存済み）
+    }
+  }
+
+  /// 特定ユーザーのランキング情報を更新
+  Future<void> _updateRankingForUser(String userId) async {
+    final user = await userRepository.getUser(userId);
+    if (user == null) {
+      print('[GameState] ユーザー情報が見つかりません: $userId');
+      return;
+    }
+
+    await rankingRepository.updateRanking(
+      userId: user.userId,
+      nickname: user.nickname,
+      totalMatches: user.totalMatches,
+      wins: user.wins,
+      winRate: user.winRate,
+    );
+  }
+
+  /// 結果待機タイマー開始（10秒タイムアウト & 両者準備完了監視）
+  void _startResultWaitingTimer() {
+    _resultWaitingTimer?.cancel();
+
+    // マッチ監視開始（すでに監視中だが、状態変化を検知）
+    _matchSubscription?.cancel();
+    _matchSubscription = matchRepository
+        .watchMatch(state.matchId)
+        .listen((match) {
+      if (match == null) {
+        return;
+      }
+
+      // 最新のマッチデータで状態を更新
+      state = state.copyWith(match: match);
+
+      // 両者が結果準備完了か確認
+      if (match.player1ReadyForResult && match.player2ReadyForResult) {
+        _resultWaitingTimer?.cancel();
+        unawaited(_matchSubscription?.cancel());
+
+        // 結果画面へ遷移
+        state = state.copyWith(phase: GamePhase.finished);
+        return;
+      }
+    });
+
+    // 10秒タイムアウトタイマー
+    _resultWaitingTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        final current = state;
+
+        if (current.resultWaitingTimeRemaining <= 0) {
+          timer.cancel();
+          unawaited(_matchSubscription?.cancel());
+
+          // タイムアウト処理
+          unawaited(_onResultWaitingTimeout());
+          return;
+        }
+
+        state = current.copyWith(
+          resultWaitingTimeRemaining: current.resultWaitingTimeRemaining - 1,
+        );
+      },
+    );
+  }
+
+  /// 結果待機タイムアウト（10秒経過 → 待機側の勝利）
+  Future<void> _onResultWaitingTimeout() async {
+    final currentState = state;
+    final match = currentState.match;
+
+    // 相手が準備完了していない場合、自分の勝利に変更
+    final isPlayer1 = currentState.isPlayer1(currentUserId);
+    final opponentReady = isPlayer1
+        ? match.player2ReadyForResult
+        : match.player1ReadyForResult;
+
+    if (!opponentReady) {
+      // 相手がタイムアウト → 自分の勝利に変更
+      final newWinner = isPlayer1 ? 'player1' : 'player2';
+
+      await matchRepository.finishMatch(
+        matchId: currentState.matchId,
+        winnerId: newWinner,
+      );
+
+      // 成績を再更新
+      await _updateMatchStats(match, newWinner);
+    }
+
+    // 結果画面へ遷移
+    state = currentState.copyWith(phase: GamePhase.finished);
   }
 
   /// 手動でゲームを終了
@@ -531,7 +688,8 @@ class GameStateNotifier extends _$GameStateNotifier {
     _countdownTimer?.cancel();
     _playingTimer?.cancel();
     _preparingTimeoutTimer?.cancel();
-    _smileSubscription?.cancel();
+    _resultWaitingTimer?.cancel();
+    unawaited(_smileSubscription?.cancel());
 
     // カメラを停止
     try {

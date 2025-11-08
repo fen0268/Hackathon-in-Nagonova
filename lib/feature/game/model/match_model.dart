@@ -27,6 +27,8 @@ abstract class MatchModel with _$MatchModel {
     // 結果
     String? winner,
     @NullableDateTimeConverter() DateTime? gameEndedAt,
+    @Default(false) bool player1ReadyForResult,
+    @Default(false) bool player2ReadyForResult,
     // 統計
     double? player1UploadTime,
     double? player2UploadTime,

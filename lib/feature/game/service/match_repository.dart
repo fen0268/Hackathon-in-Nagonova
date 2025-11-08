@@ -142,6 +142,23 @@ class MatchRepository {
     });
   }
 
+  /// プレイヤーが結果準備完了をマーク
+  Future<void> markPlayerReadyForResult({
+    required String matchId,
+    required String playerId,
+  }) async {
+    final match = await getMatch(matchId);
+    if (match == null) {
+      throw Exception('Match not found');
+    }
+
+    final isPlayer1 = match.player1 == playerId;
+
+    await _matchesCollection.doc(matchId).update({
+      '${isPlayer1 ? 'player1' : 'player2'}ReadyForResult': true,
+    });
+  }
+
   /// ユーザーの最近のマッチ一覧を取得
   Future<List<MatchModel>> getUserMatches(
     String userId, {
