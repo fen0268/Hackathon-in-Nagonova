@@ -37,9 +37,8 @@ class RankingRepository {
   /// トップランキングを取得（勝率順）
   Future<List<RankingModel>> getTopRankingsByWinRate({int limit = 20}) async {
     final snapshot = await _rankingsCollection
-        .where('totalMatches', isGreaterThanOrEqualTo: 3)
-        .orderBy('totalMatches')
         .orderBy('winRate', descending: true)
+        .orderBy('totalMatches', descending: true)
         .limit(limit)
         .get();
 
@@ -72,9 +71,8 @@ class RankingRepository {
   /// ランキング情報をストリームで取得（勝率順）
   Stream<List<RankingModel>> watchTopRankingsByWinRate({int limit = 20}) {
     return _rankingsCollection
-        .where('totalMatches', isGreaterThanOrEqualTo: 3)
-        .orderBy('totalMatches')
         .orderBy('winRate', descending: true)
+        .orderBy('totalMatches', descending: true)
         .limit(limit)
         .snapshots()
         .map(
