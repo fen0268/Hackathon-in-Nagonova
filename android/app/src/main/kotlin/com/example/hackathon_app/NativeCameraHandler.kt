@@ -376,20 +376,27 @@ class NativeCameraHandler(
     }
 
     private fun detectSmile(result: FaceLandmarkerResult?): Boolean {
-        if (result == null || result.faceBlendshapes().isEmpty()) {
+        if (result == null) {
+            return false
+        }
+
+        val blendshapesList = result.faceBlendshapes()
+        if (blendshapesList.isEmpty()) {
             return false
         }
 
         // MediaPipeの顔表情データから笑顔を判定
         // blendshapes には mouthSmileLeft, mouthSmileRight などが含まれる
-        val blendshapes = result.faceBlendshapes()[0]
+        // get()はList<List<Category>>を返すので、最初のリストを取得
+        val blendshapes = blendshapesList.get()[0]
 
         var smileScore = 0.0f
-        for (category in blendshapes) {
-            when (category.categoryName()) {
-                "mouthSmileLeft", "mouthSmileRight" -> {
-                    smileScore += category.score()
-                }
+        for (i in 0 until blendshapes.size) {
+            val category = blendshapes[i]
+            // MediaPipeのCategoryクラスはdisplayName()とscore()をメソッドとして持つ
+            val name = category.displayName()
+            if (name == "mouthSmileLeft" || name == "mouthSmileRight") {
+                smileScore += category.score()
             }
         }
 
