@@ -10,17 +10,18 @@ import '../ranking/ranking_page.dart';
 import '../settings/settings_page.dart';
 
 /// 現在のユーザー情報を取得するプロバイダー
-final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) {
-  final currentUser = ref.watch(authStateChangesProvider).value;
-  final userId = currentUser?.uid ?? '';
+final FutureProvider<UserModel?> currentUserProvider =
+    FutureProvider.autoDispose<UserModel?>((ref) {
+      final currentUser = ref.watch(authStateChangesProvider).value;
+      final userId = currentUser?.uid ?? '';
 
-  if (userId.isEmpty) {
-    return Future.value(null);
-  }
+      if (userId.isEmpty) {
+        return Future.value();
+      }
 
-  final userRepository = ref.watch(userRepositoryProvider);
-  return userRepository.getUser(userId);
-});
+      final userRepository = ref.watch(userRepositoryProvider);
+      return userRepository.getUser(userId);
+    });
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});

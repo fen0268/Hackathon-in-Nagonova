@@ -132,8 +132,8 @@ class _ResultPageState extends ConsumerState<ResultPage> {
   ) {
     // 勝敗判定
     final winner = match.winner;
-    final bool isWinner = _determineWinner(winner, isPlayer1);
-    final bool isDraw = winner == 'draw' || winner == null;
+    final isWinner = _determineWinner(winner, isPlayer1);
+    final isDraw = winner == 'draw' || winner == null;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -182,24 +182,36 @@ class _ResultPageState extends ConsumerState<ResultPage> {
 
   /// 勝敗判定
   bool _determineWinner(String? winner, bool isPlayer1) {
-    if (winner == null) return false;
-    if (winner == 'draw') return false;
-    if (winner == 'player1' && isPlayer1) return true;
-    if (winner == 'player2' && !isPlayer1) return true;
+    if (winner == null) {
+      return false;
+    }
+    if (winner == 'draw') {
+      return false;
+    }
+    if (winner == 'player1' && isPlayer1) {
+      return true;
+    }
+    if (winner == 'player2' && !isPlayer1) {
+      return true;
+    }
     return false;
   }
 
   /// 対戦統計情報
   Widget _buildMatchStats(MatchModel match, bool isPlayer1) {
-    final playerReactionTime = isPlayer1 ? match.player1ReactionTime : match.player2ReactionTime;
-    final opponentReactionTime = isPlayer1 ? match.player2ReactionTime : match.player1ReactionTime;
+    final playerReactionTime = isPlayer1
+        ? match.player1ReactionTime
+        : match.player2ReactionTime;
+    final opponentReactionTime = isPlayer1
+        ? match.player2ReactionTime
+        : match.player1ReactionTime;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[900],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(color: Colors.grey[800]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +232,11 @@ class _ResultPageState extends ConsumerState<ResultPage> {
   }
 
   /// 統計行
-  Widget _buildStatRow(String label, double? playerValue, double? opponentValue) {
+  Widget _buildStatRow(
+    String label,
+    double? playerValue,
+    double? opponentValue,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -235,10 +251,15 @@ class _ResultPageState extends ConsumerState<ResultPage> {
               style: const TextStyle(color: Colors.blue, fontSize: 14),
             ),
             const SizedBox(width: 8),
-            const Text('vs', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            const Text(
+              'vs',
+              style: TextStyle(color: Colors.white70, fontSize: 12),
+            ),
             const SizedBox(width: 8),
             Text(
-              opponentValue != null ? '${opponentValue.toStringAsFixed(2)}秒' : '-',
+              opponentValue != null
+                  ? '${opponentValue.toStringAsFixed(2)}秒'
+                  : '-',
               style: const TextStyle(color: Colors.orange, fontSize: 14),
             ),
           ],
@@ -319,5 +340,4 @@ class _ResultPageState extends ConsumerState<ResultPage> {
       ],
     );
   }
-
 }
