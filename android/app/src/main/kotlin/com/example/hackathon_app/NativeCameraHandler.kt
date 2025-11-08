@@ -40,8 +40,8 @@ class NativeCameraHandler(
 
     companion object {
         private const val TAG = "NativeCameraHandler"
-        private const val SMILE_THRESHOLD = 0.7
-        private const val CONSECUTIVE_FRAMES_REQUIRED = 3
+        private const val SMILE_THRESHOLD = 0.5
+        private const val CONSECUTIVE_FRAMES_REQUIRED = 2
         private const val TARGET_FPS = 20
         private const val FRAME_INTERVAL_MS = 1000L / TARGET_FPS
     }
