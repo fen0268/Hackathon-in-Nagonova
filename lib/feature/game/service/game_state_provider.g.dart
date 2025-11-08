@@ -61,7 +61,7 @@ final class GameStateNotifierProvider
   }
 }
 
-String _$gameStateNotifierHash() => r'79b105eae82b58276f865be94fcafd835be51854';
+String _$gameStateNotifierHash() => r'3d83317cf84801e967d2987457d56dabad3a34a8';
 
 /// ゲーム状態管理プロバイダー
 
