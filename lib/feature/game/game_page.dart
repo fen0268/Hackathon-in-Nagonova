@@ -208,9 +208,15 @@ class _GamePageState extends ConsumerState<GamePage> {
   /// 撮影前のカウントダウン表示（5→4→3→2→1）
   /// ネイティブ側でカメラビューとカウントダウンUIを表示
   Widget _buildCountdownView(GameState gameState) {
+    final cameraService = ref
+        .read(gameStateProvider(widget.matchId).notifier)
+        .cameraService;
+
     // ネイティブ側でカウントダウンUIを表示するため、Flutter側はシンプルに表示
-    return const SizedBox.expand(
-      child: NativeCameraView(),
+    return SizedBox.expand(
+      child: NativeCameraView(
+        cameraService: cameraService,
+      ),
     );
   }
 
