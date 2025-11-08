@@ -93,7 +93,7 @@ class GameStateNotifier extends _$GameStateNotifier {
   NativeCameraService? _cameraService;
   UserRepository? _userRepository;
   RankingRepository? _rankingRepository;
-  String? _currentUserId;
+  late String? _currentUserId;
   bool _initialized = false;
 
   StreamSubscription<MatchModel?>? _matchSubscription;
@@ -173,7 +173,7 @@ class GameStateNotifier extends _$GameStateNotifier {
             // ステータスに応じた処理
             _handleMatchStatusChange(match);
           },
-          onError: (error) {
+          onError: (Object error) {
             state = state.copyWith(error: 'マッチの監視エラー: $error');
           },
         );
@@ -210,20 +210,14 @@ class GameStateNotifier extends _$GameStateNotifier {
     final currentState = state;
 
     try {
-      print('[GameState] カメラ起動開始');
-
       // ネイティブカメラを起動（カウントダウンは5秒に設定）
       // ネイティブ側でカウントダウンUIを表示し、自動で撮影まで行う
       // awaitで撮影完了まで待機（ネイティブ側から通知が来るまでブロック）
       await cameraService.startCameraWithCountdown();
 
-      print('[GameState] 撮影完了通知を受信');
-
       // 撮影完了後に次のフェーズへ
       await _onShootingCountdownComplete();
-    } on Exception catch (e, stackTrace) {
-      print('[GameState] カメラ起動エラー: $e');
-      print('[GameState] スタックトレース: $stackTrace');
+    } on Exception catch (e) {
       state = currentState.copyWith(error: 'カメラの起動に失敗: $e');
     }
   }
@@ -232,27 +226,21 @@ class GameStateNotifier extends _$GameStateNotifier {
   Future<void> _onShootingCountdownComplete() async {
     final currentState = state;
 
-    print('[GameState] 撮影完了処理開始');
-
     // ローディング表示を開始
     state = currentState.copyWith(isUploading: true);
 
     // 撮影時刻を記録
     final shootingAt = DateTime.now();
-    print('[GameState] Firestoreに撮影時刻を記録中...');
     await matchRepository.updateMatchData(
       matchId: currentState.matchId,
       data: {'shootingAt': shootingAt},
     );
-    print('[GameState] 撮影時刻記録完了');
 
     // 撮影した画像を取得してアップロード
     await _uploadCapturedImage();
 
     // カメラを停止（準備画面ではカメラプレビューを表示しない）
-    print('[GameState] カメラ停止中...');
     await cameraService.stopCamera();
-    print('[GameState] カメラ停止完了');
 
     // ローディング表示を終了して準備中フェーズへ
     state = state.copyWith(
@@ -261,16 +249,13 @@ class GameStateNotifier extends _$GameStateNotifier {
       isUploading: false,
     );
 
-    print('[GameState] Firestoreにステータス更新中: preparing');
     await matchRepository.updateMatchStatus(
       currentState.matchId,
       'preparing',
     );
-    print('[GameState] ステータス更新完了');
 
     // 5秒後に自動的に画像表示フェーズへ
     _startPreparingTimer();
-    print('[GameState] 5秒タイマー開始');
   }
 
   /// 撮影画像をアップロード
@@ -278,11 +263,8 @@ class GameStateNotifier extends _$GameStateNotifier {
     final currentState = state;
 
     try {
-      print('[GameState] 画像アップロード開始');
-
       // ネイティブから撮影画像のパスを取得
       final imagePath = await cameraService.getCapturedImagePath();
-      print('[GameState] 撮影画像パス: $imagePath');
 
       if (imagePath == null) {
         throw Exception('撮影画像が取得できませんでした');
@@ -295,24 +277,15 @@ class GameStateNotifier extends _$GameStateNotifier {
         throw Exception('画像ファイルが存在しません: $imagePath');
       }
 
-      final fileSize = await imageFile.length();
-      print('[GameState] 画像ファイルサイズ: ${fileSize} bytes');
-
       final playerNumber = currentState.isPlayer1(currentUserId) ? 1 : 2;
-      print('[GameState] プレイヤー番号: $playerNumber');
 
       // Firebase認証状態を確認
       final currentAuthUser = FirebaseAuth.instance.currentUser;
-      final authStatus = currentAuthUser != null
-          ? '認証済み (UID: ${currentAuthUser.uid})'
-          : '未認証';
-      print('[GameState] Firebase認証状態: $authStatus');
       if (currentAuthUser == null) {
         throw Exception('Firebase認証が必要です');
       }
 
       // Firebase Storageにアップロード
-      print('[GameState] Firebase Storageへアップロード開始...');
       final uploadStartTime = DateTime.now();
       final imageUrl = await storageService.uploadMatchImage(
         matchId: currentState.matchId,
@@ -322,16 +295,13 @@ class GameStateNotifier extends _$GameStateNotifier {
 
       final uploadTime =
           DateTime.now().difference(uploadStartTime).inMilliseconds / 1000.0;
-      print('[GameState] アップロード完了: ${uploadTime}秒, URL: $imageUrl');
 
       // Firestoreに画像URLを更新
-      print('[GameState] Firestoreに画像URL更新中...');
       await matchRepository.updateImageUpload(
         matchId: currentState.matchId,
         playerId: currentUserId,
         imageUrl: imageUrl,
       );
-      print('[GameState] Firestore更新完了');
 
       // アップロード時間を記録
       final isPlayer1 = currentState.isPlayer1(currentUserId);
@@ -341,11 +311,7 @@ class GameStateNotifier extends _$GameStateNotifier {
           '${isPlayer1 ? 'player1' : 'player2'}UploadTime': uploadTime,
         },
       );
-      print('[GameState] アップロード時間記録完了');
-    } catch (e, stackTrace) {
-      print('[GameState] 画像アップロードエラー: $e');
-      print('[GameState] スタックトレース: $stackTrace');
-
+    } catch (e) {
       state = currentState.copyWith(
         error: '画像のアップロードに失敗: $e',
       );
@@ -442,7 +408,7 @@ class GameStateNotifier extends _$GameStateNotifier {
     await cameraService.startSmileDetection();
 
     // 笑顔判定結果を監視
-    _smileSubscription?.cancel();
+    await _smileSubscription?.cancel();
     _smileSubscription = cameraService.smileDetectionStream.listen(
       (result) {
         final current = state;
@@ -478,7 +444,7 @@ class GameStateNotifier extends _$GameStateNotifier {
     final currentState = state;
 
     _playingTimer?.cancel();
-    _smileSubscription?.cancel();
+    await _smileSubscription?.cancel();
     await cameraService.stopSmileDetection();
 
     // 笑顔検知時刻を記録
@@ -513,7 +479,7 @@ class GameStateNotifier extends _$GameStateNotifier {
 
   /// 対戦タイムアウト（20秒経過 → 引き分け）
   Future<void> _onPlayingTimeout() async {
-    _smileSubscription?.cancel();
+    await _smileSubscription?.cancel();
     await cameraService.stopSmileDetection();
 
     // 20秒経過しても笑わず → 引き分け
@@ -534,7 +500,7 @@ class GameStateNotifier extends _$GameStateNotifier {
     _countdownTimer?.cancel();
     _playingTimer?.cancel();
     _preparingTimeoutTimer?.cancel();
-    _smileSubscription?.cancel();
+    await _smileSubscription?.cancel();
 
     await cameraService.stopCamera();
 
@@ -582,8 +548,7 @@ class GameStateNotifier extends _$GameStateNotifier {
       // ランキング情報を更新（両プレイヤー）
       await _updateRankingForUser(player1Id);
       await _updateRankingForUser(player2Id);
-    } catch (e) {
-      print('[GameState] 対戦成績の更新エラー: $e');
+    } on Exception {
       // エラーが発生しても続行（ゲーム結果は保存済み）
     }
   }
@@ -592,7 +557,6 @@ class GameStateNotifier extends _$GameStateNotifier {
   Future<void> _updateRankingForUser(String userId) async {
     final user = await userRepository.getUser(userId);
     if (user == null) {
-      print('[GameState] ユーザー情報が見つかりません: $userId');
       return;
     }
 
