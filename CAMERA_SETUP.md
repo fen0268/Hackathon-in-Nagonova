@@ -37,7 +37,8 @@
 
 #### Android
 
-1. 以下のURLからモデルファイルをダウンロード:
+1. 以下の URL からモデルファイルをダウンロード:
+
    ```
    https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
    ```
@@ -49,19 +50,21 @@
 
 #### iOS
 
-1. 同じURLからモデルファイルをダウンロード
+1. 同じ URL からモデルファイルをダウンロード
 
 2. ダウンロードしたファイルを以下のディレクトリに配置:
+
    ```
    ios/Runner/Resources/face_landmarker.task
    ```
 
-3. Xcodeでプロジェクトを開く:
+3. Xcode でプロジェクトを開く:
+
    ```bash
    open ios/Runner.xcworkspace
    ```
 
-4. Xcodeで以下の操作を実行:
+4. Xcode で以下の操作を実行:
    - `face_landmarker.task` ファイルをプロジェクトにドラッグ&ドロップ
    - "Copy items if needed" にチェック
    - "Add to targets" で `Runner` を選択
@@ -72,7 +75,8 @@
 
 依存関係は `android/app/build.gradle.kts` に既に追加されています。
 
-Gradle同期を実行:
+Gradle 同期を実行:
+
 ```bash
 cd android && ./gradlew build
 ```
@@ -81,7 +85,8 @@ cd android && ./gradlew build
 
 依存関係は `ios/Podfile` に既に追加されています。
 
-CocoaPodsをインストール:
+CocoaPods をインストール:
+
 ```bash
 cd ios && pod install
 ```
@@ -91,6 +96,7 @@ cd ios && pod install
 #### Android
 
 `android/app/src/main/AndroidManifest.xml` に既に追加済み:
+
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-feature android:name="android.hardware.camera" android:required="true" />
@@ -99,6 +105,7 @@ cd ios && pod install
 #### iOS
 
 `ios/Runner/Info.plist` に既に追加済み:
+
 ```xml
 <key>NSCameraUsageDescription</key>
 <string>このアプリはにらめっこ対戦のためにカメラを使用します</string>
@@ -170,13 +177,15 @@ await cameraService.startSmileDetection();
 
 ## 主要クラス
 
-### Flutter側
+### Flutter 側
 
 #### `NativeCameraService`
+
 - Method Channel / Event Channel を管理
-- ネイティブ側の機能を呼び出すAPI提供
+- ネイティブ側の機能を呼び出す API 提供
 
 **主要メソッド:**
+
 - `startCameraWithCountdown()`: カメラ起動＋カウントダウン
 - `startSmileDetection()`: 笑顔判定開始
 - `stopSmileDetection()`: 笑顔判定停止
@@ -184,56 +193,65 @@ await cameraService.startSmileDetection();
 - `smileDetectionStream`: 判定結果のストリーム
 
 #### `GamePage`
-- ゲーム画面のUI
+
+- ゲーム画面の UI
 - カウントダウン、撮影、判定のフロー制御
 
-### Android側
+### Android 側
 
 #### `MainActivity.kt`
+
 - Method Channel / Event Channel のハンドラー登録
 - カメラ権限管理
 
 #### `NativeCameraHandler.kt`
+
 - CameraX によるカメラ制御
 - MediaPipe による笑顔判定
-- Event Channel でFlutter側に結果を送信
+- Event Channel で Flutter 側に結果を送信
 
 **主要機能:**
+
 - カメラプレビュー表示
 - 写真撮影
 - リアルタイム笑顔判定（20fps）
 
-### iOS側
+### iOS 側
 
 #### `AppDelegate.swift`
+
 - Method Channel / Event Channel のハンドラー登録
 
 #### `NativeCameraHandler.swift`
+
 - AVFoundation によるカメラ制御
 - MediaPipe による笑顔判定
-- Event Channel でFlutter側に結果を送信
+- Event Channel で Flutter 側に結果を送信
 
 **主要機能:**
+
 - カメラプレビュー表示
 - 写真撮影
 - リアルタイム笑顔判定（20fps）
 
 ## MediaPipe 笑顔判定の仕組み
 
-1. **Face Landmarker** を使用して顔のランドマーク（468点）と表情データ（BlendShapes）を取得
+1. **Face Landmarker** を使用して顔のランドマーク（468 点）と表情データ（BlendShapes）を取得
 
 2. **BlendShapes** から以下の値を抽出:
+
    - `mouthSmileLeft`: 左口角の笑顔スコア
    - `mouthSmileRight`: 右口角の笑顔スコア
 
 3. **判定ロジック:**
+
    ```
    averageSmileScore = (mouthSmileLeft + mouthSmileRight) / 2
-   isSmiling = averageSmileScore > 0.7
+   isSmiling = averageSmileScore > 0.5
    ```
 
 4. **連続フレーム判定:**
-   - 3フレーム連続で笑顔を検出した場合のみ「笑った」と判定
+   - 3 フレーム連続で笑顔を検出した場合のみ「笑った」と判定
    - 誤検知を防ぐための仕組み
 
 ## パフォーマンス設定
@@ -249,43 +267,47 @@ await cameraService.startSmileDetection();
 ### カメラが起動しない
 
 **iOS:**
+
 - Info.plist に `NSCameraUsageDescription` が設定されているか確認
 - シミュレーターではなく実機で実行しているか確認
 
 **Android:**
+
 - AndroidManifest.xml に `CAMERA` 権限が設定されているか確認
 - 実行時にカメラ権限を許可したか確認
 
 ### MediaPipe のエラー
 
 **モデルファイルが見つからない:**
+
 - `face_landmarker.task` が正しいディレクトリに配置されているか確認
-- iOS: Xcodeのプロジェクトに追加されているか確認（Build Phases → Copy Bundle Resources）
+- iOS: Xcode のプロジェクトに追加されているか確認（Build Phases → Copy Bundle Resources）
 
 **判定精度が低い:**
+
 - 照明条件を改善
 - 閾値を調整（`SMILE_THRESHOLD` の値を変更）
 
 ### 通信エラー
 
 **Method Channel が動作しない:**
+
 - チャネル名が一致しているか確認:
-  - `com.example.hackathon_app/camera`
-  - `com.example.hackathon_app/camera_events`
+  - `com.fenc0268.hackathon_app/camera`
+  - `com.fenc0268.hackathon_app/camera_events`
 
 ## 今後の拡張
 
 ### 実装済み
+
 - ✅ カメラ起動・撮影
 - ✅ カウントダウン機能
 - ✅ リアルタイム笑顔判定（20fps）
 - ✅ Flutter ⇔ Native 通信
 
 ### 今後実装予定
-- ⬜ 撮影音の追加
-- ⬜ Firebase Storage への画像アップロード
-- ⬜ 対戦相手の画像表示
-- ⬜ 2ラウンド制の実装
+
+- ⬜ WebRTCを使用したビデオ通信用の実装
 - ⬜ 絵文字エフェクト機能
 
 ## 参考リンク

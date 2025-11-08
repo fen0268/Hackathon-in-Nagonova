@@ -1,4 +1,4 @@
-package com.example.hackathon_app
+package com.fenc0268.hackathon_app
 
 import android.content.Context
 import android.graphics.Bitmap

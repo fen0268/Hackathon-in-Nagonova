@@ -1,6 +1,5 @@
 {
   "dart.flutterSdkPath": ".fvm/versions/3.35.7",
-  "cSpell.words": [
-    "hackathon"
-  ]
+  "cSpell.words": ["hackathon"],
+  "r.lsp.promptToInstall": false
 }

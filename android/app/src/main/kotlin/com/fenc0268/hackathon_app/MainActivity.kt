@@ -1,4 +1,4 @@
-package com.example.hackathon_app
+package com.fenc0268.hackathon_app
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -11,9 +11,9 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CAMERA_CHANNEL = "com.example.hackathon_app/camera"
-    private val CAMERA_EVENTS_CHANNEL = "com.example.hackathon_app/camera_events"
-    private val CAMERA_VIEW_TYPE = "com.example.hackathon_app/camera_view"
+    private val CAMERA_CHANNEL = "com.fenc0268.hackathon_app/camera"
+    private val CAMERA_EVENTS_CHANNEL = "com.fenc0268.hackathon_app/camera_events"
+    private val CAMERA_VIEW_TYPE = "com.fenc0268.hackathon_app/camera_view"
     private val CAMERA_PERMISSION_REQUEST_CODE = 100
 
     private var methodChannel: MethodChannel? = null

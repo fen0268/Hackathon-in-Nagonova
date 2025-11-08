@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 class NativeCameraView extends StatelessWidget {
   const NativeCameraView({super.key});
 
-  static const String viewType = 'com.example.hackathon_app/camera_view';
+  static const String viewType = 'com.fenc0268.hackathon_app/camera_view';
 
   @override
   Widget build(BuildContext context) {

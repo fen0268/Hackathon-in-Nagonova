@@ -3,9 +3,9 @@ import UIKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
-    private let CAMERA_CHANNEL = "com.example.hackathon_app/camera"
-    private let CAMERA_EVENTS_CHANNEL = "com.example.hackathon_app/camera_events"
-    private let CAMERA_VIEW_TYPE = "com.example.hackathon_app/camera_view"
+    private let CAMERA_CHANNEL = "com.fenc0268.hackathon_app/camera"
+    private let CAMERA_EVENTS_CHANNEL = "com.fenc0268.hackathon_app/camera_events"
+    private let CAMERA_VIEW_TYPE = "com.fenc0268.hackathon_app/camera_view"
 
     private var nativeCameraHandler: NativeCameraHandler?
 

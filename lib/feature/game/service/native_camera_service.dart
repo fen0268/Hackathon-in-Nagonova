@@ -39,9 +39,9 @@ class SmileDetectionResult {
 /// iOS/Android のネイティブカメラとMediaPipeを制御する
 class NativeCameraService {
   static const MethodChannel _methodChannel =
-      MethodChannel('com.example.hackathon_app/camera');
+      MethodChannel('com.fenc0268.hackathon_app/camera');
   static const EventChannel _eventChannel =
-      EventChannel('com.example.hackathon_app/camera_events');
+      EventChannel('com.fenc0268.hackathon_app/camera_events');
 
   Stream<SmileDetectionResult>? _smileDetectionStream;
   StreamSubscription<SmileDetectionResult>? _smileSubscription;
